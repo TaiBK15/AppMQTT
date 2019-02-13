@@ -79,15 +79,6 @@ public class MqttApi {
                     disconnectedBufferOptions.setPersistBuffer(false);
                     disconnectedBufferOptions.setDeleteOldestMessages(false);
                     mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
-//                    Toast.makeText(this, "connected", Toast.LENGTH_LONG).show();
-//                    display();
-//                    try {
-//                        publishMessage(mqttAndroidClient, "TestMQTT", 0, publish_topic);
-//                    } catch (MqttException e) {
-//                        e.printStackTrace();
-//                    } catch (UnsupportedEncodingException e) {
-//                        e.printStackTrace();
-//                    }
 //                    publishMessage(mqttAndroidClient, "TestMQTT", 0, publish_topic);
 //                    subscribe(mqttAndroidClient, subcribe_topic, 0);
                     sendMessage();
@@ -106,7 +97,7 @@ public class MqttApi {
 //                    Toast.makeText(this, "failed to connect", Toast.LENGTH_LONG).show();
                     Log.d(Tag, "Fail to connect");
                     try {
-                        isconn.inform("Fail to connect");
+                        isconn.inform("Fail to connect. Check your network");
 
                     } catch (NullPointerException e) {
                         e.printStackTrace();
