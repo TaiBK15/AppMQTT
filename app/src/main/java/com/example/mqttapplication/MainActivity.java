@@ -23,10 +23,14 @@ public class MainActivity extends AppCompatActivity implements MqttApi.Isconnect
 //    final String publish_topic = "DOWNLINK";
 //    final String subcribe_topic = "UPLINK";
 
+    boolean flag_conn;
+
     MqttApi mqttclient;
     TextView datarecv;
     Button conn, disconn, send;
-    private boolean flag_conn;
+
+    public MainActivity() {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements MqttApi.Isconnect
     private void startMqtt() {
 //        mqttAndroidClient = new MqttAndroidClient(getApplicationContext(), hostserver, clientID);
         mqttclient = new MqttApi(getApplicationContext());
+        mqttclient.isconn = this;
         mqttclient.connect();
 //        mqttclient.publishMessage(mqttAndroidClient, clientID, 0, publish_topic);
 
@@ -93,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements MqttApi.Isconnect
 
     @Override
     public void inform(String mess) {
-        Toast.makeText(this, mess, Toast.LENGTH_LONG).show();
+        Toast.makeText(MainActivity.this, mess, Toast.LENGTH_LONG).show();
     }
 
 }

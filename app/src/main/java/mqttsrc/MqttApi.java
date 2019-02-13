@@ -14,7 +14,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
-import java.nio.charset.StandardCharsets;
+import java.io.UnsupportedEncodingException;
 
 public class MqttApi {
 
@@ -27,7 +27,7 @@ public class MqttApi {
     public MqttAndroidClient mqttAndroidClient;
     public boolean flag = true;
     private String Tag = "MqttApplication";
-    private Isconnect isconn;
+    public Isconnect isconn;
 
     public MqttApi(Context context) {
         mqttAndroidClient = new MqttAndroidClient(context, hostserver, clientID);
@@ -88,10 +88,16 @@ public class MqttApi {
 //                    } catch (UnsupportedEncodingException e) {
 //                        e.printStackTrace();
 //                    }
-                    publishMessage(mqttAndroidClient, "TestMQTT", 0, publish_topic);
+//                    publishMessage(mqttAndroidClient, "TestMQTT", 0, publish_topic);
 //                    subscribe(mqttAndroidClient, subcribe_topic, 0);
+                    sendMessage();
                     Log.d(Tag, "Connected");
-//                    isconn.inform("Connected");
+                    try {
+                        isconn.inform("Connected");
+
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+                    }
                 }
 
 
@@ -99,6 +105,12 @@ public class MqttApi {
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
 //                    Toast.makeText(this, "failed to connect", Toast.LENGTH_LONG).show();
                     Log.d(Tag, "Fail to connect");
+                    try {
+                        isconn.inform("Fail to connect");
+
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+                    }
 //                    return false;
                 }
 
@@ -121,17 +133,23 @@ public class MqttApi {
 //        }
     }
 
+    public void sendMessage() {
+        publishMessage(mqttAndroidClient, "TestMQTT", 0, publish_topic);
+
+    }
     public void publishMessage(@NonNull MqttAndroidClient client,
                                @NonNull String msg, int qos, @NonNull String topic) {
         try {
             byte[] encodedPayload = new byte[0];
-            encodedPayload = msg.getBytes(StandardCharsets.UTF_8);
+            encodedPayload = msg.getBytes("UTF_8");
             MqttMessage message = new MqttMessage(encodedPayload);
             message.setId(5866);
             message.setRetained(true);
             message.setQos(qos);
             client.publish(topic, message);
         } catch (MqttException ex) {
+            ex.printStackTrace();
+        } catch (UnsupportedEncodingException ex) {
             ex.printStackTrace();
         }
 
