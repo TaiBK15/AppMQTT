@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Size Circle Background -->
+    <dimen name="size_icon_connection_status">200dp</dimen>
+</resources>

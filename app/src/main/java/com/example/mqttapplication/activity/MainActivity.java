@@ -1,19 +1,23 @@
-package com.example.mqttapplication;
+package com.example.mqttapplication.activity;
 
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
+import com.example.mqttapplication.R;
+import com.example.mqttapplication.adapter.ViewPagerAdapter;
+import com.example.mqttapplication.fragment.FragmentConnectStatus;
+import com.example.mqttapplication.fragment.FragmentDeviceList;
 
-import mqttsrc.MqttApi;
+public class MainActivity extends AppCompatActivity {
 
-public class MainActivity extends AppCompatActivity implements MqttApi.Isconnect {
+    private TabLayout tablayout;
+    private ViewPager viewPager;
+    private Toolbar toolbar;
+
 //    public MqttAndroidClient mqttAndroidClient;
 //
 //    final String hostserver = "tcp://m10.cloudmqtt.com:10452";
@@ -23,82 +27,91 @@ public class MainActivity extends AppCompatActivity implements MqttApi.Isconnect
 //    final String publish_topic = "DOWNLINK";
 //    final String subcribe_topic = "UPLINK";
 
-    boolean flag_conn;
-
-    MqttApi mqttclient;
-    TextView datarecv;
-    Button conn, disconn, send;
-
-    public MainActivity() {
-    }
+//    boolean flag_conn;
+//
+//    MqttApi mqttclient;
+//    TextView datarecv;
+//    Button conn, disconn, send;
+//
+//    public MainActivity() {
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        datarecv = findViewById(R.id.message);
-        send = findViewById(R.id.send);
-        conn = findViewById(R.id.connect);
-        disconn = findViewById(R.id.disconnect);
+        toolbar = findViewById(R.id.main_toolbar);
+        setSupportActionBar(toolbar);
 
-        conn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startMqtt();
-            }
-        });
+        tablayout = (TabLayout) findViewById(R.id.tablayout_main_activity);
+        viewPager = (ViewPager) findViewById(R.id.viewpager_main_activity);
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-//        disconn.setOnClickListener(new View.OnClickListener(){
+        //Add fragment
+        adapter.addFragment(new FragmentConnectStatus(), "Connect");
+        adapter.addFragment(new FragmentDeviceList(), "Device");
+
+        viewPager.setAdapter(adapter);
+        tablayout.setupWithViewPager(viewPager);
+
+        //Add icon for tablayout
+        tablayout.getTabAt(0).setIcon(R.drawable.ic_wifi_white);
+        tablayout.getTabAt(1).setIcon(R.drawable.ic_list);
+
+
+
+    }
+
+//    private void startMqtt() {
+////        mqttAndroidClient = new MqttAndroidClient(getApplicationContext(), hostserver, clientID);
+//        mqttclient = new MqttApi(getApplicationContext());
+//        mqttclient.isconn = this;
+//        mqttclient.connect();
+////        mqttclient.publishMessage(mqttAndroidClient, clientID, 0, publish_topic);
+//
+////        Toast.makeText(this, "Connected", Toast.LENGTH_LONG).show();
+//
+//        mqttclient.setCallback(new MqttCallbackExtended() {
 //            @Override
-//            public void onClick(View v) {
-//                mqttclient.disconnect();
+//            public void connectComplete(boolean reconnect, String serverURI) {
+//
+//            }
+//
+//            @Override
+//            public void connectionLost(Throwable cause) {
+//
+//            }
+//
+//            @Override
+//            public void messageArrived(String topic, MqttMessage message) {
+//                datarecv.setText(message.toString());
+//            }
+//
+//            @Override
+//            public void deliveryComplete(IMqttDeliveryToken token) {
+//
 //            }
 //        });
-
-
-    }
-
-    private void startMqtt() {
-//        mqttAndroidClient = new MqttAndroidClient(getApplicationContext(), hostserver, clientID);
-        mqttclient = new MqttApi(getApplicationContext());
-        mqttclient.isconn = this;
-        mqttclient.connect();
-//        mqttclient.publishMessage(mqttAndroidClient, clientID, 0, publish_topic);
-
-//        Toast.makeText(this, "Connected", Toast.LENGTH_LONG).show();
-
-        mqttclient.setCallback(new MqttCallbackExtended() {
-            @Override
-            public void connectComplete(boolean reconnect, String serverURI) {
-
-            }
-
-            @Override
-            public void connectionLost(Throwable cause) {
-
-            }
-
-            @Override
-            public void messageArrived(String topic, MqttMessage message) {
-                datarecv.setText(message.toString());
-            }
-
-            @Override
-            public void deliveryComplete(IMqttDeliveryToken token) {
-
-            }
-        });
-//        if(flag_conn == true)
-//            Toast.makeText(this, "Connected", Toast.LENGTH_LONG).show();
-//        else
-//            Toast.makeText(this, "fail to connect", Toast.LENGTH_LONG).show();
-    }
+////        if(flag_conn == true)
+////            Toast.makeText(this, "Connected", Toast.LENGTH_LONG).show();
+////        else
+////            Toast.makeText(this, "fail to connect", Toast.LENGTH_LONG).show();
+//    }
+//
+//
+//    @Override
+//    public void inform(String mess) {
+//        Toast.makeText(MainActivity.this, mess, Toast.LENGTH_LONG).show();
+//    }
 
 
     @Override
-    public void inform(String mess) {
-        Toast.makeText(MainActivity.this, mess, Toast.LENGTH_LONG).show();
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
     }
-
 }
+
+
+
