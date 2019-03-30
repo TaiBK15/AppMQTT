@@ -6,6 +6,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.example.mqttapplication.R;
 import com.example.mqttapplication.adapter.ViewPagerAdapter;
@@ -56,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         tablayout.setupWithViewPager(viewPager);
 
         //Add icon for tablayout
-        tablayout.getTabAt(0).setIcon(R.drawable.ic_wifi_white);
+        tablayout.getTabAt(0).setIcon(R.drawable.ic_wifi);
         tablayout.getTabAt(1).setIcon(R.drawable.ic_list);
 
 
@@ -110,6 +112,19 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if(id == R.id.main_item_menu){
+            Toast.makeText(getApplicationContext(), "Setting menu", Toast.LENGTH_LONG).show();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+
     }
 }
 

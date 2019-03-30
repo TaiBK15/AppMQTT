@@ -5,9 +5,35 @@
     <color name="colorSecondary">#303030</color>
     <color name="colorThird">#424242</color>
     <color name="colorAccent">#00DCC5</color>
+    <!--Color Theme-->
     <color name="textColorPrimary">#FFFFFF</color>
     <color name="iconColorPrimary">#FFFFFF</color>
+    <!--Color Icon Connection Status-->
     <color name="colorBackgroundIconConnected">#00FF00</color>
     <color name="colorBackgroundIconDisconnected">#ED0000</color>
+    <!--Color Device 1-->
+    <color name="colorBackgroundImageDevice_1">#E57373</color>
+    <color name="colorBackgroundTextDevice_1">#EF5350</color>
+    <!--Color Device 2-->
+    <color name="colorBackgroundImageDevice_2">#CE93D8</color>
+    <color name="colorBackgroundTextDevice_2">#AB47BC</color>
+    <!--Color Device 3-->
+    <color name="colorBackgroundImageDevice_3">#9FA8DA</color>
+    <color name="colorBackgroundTextDevice_3">#5C6BC0</color>
+    <!--Color Device 4-->
+    <color name="colorBackgroundImageDevice_4">#F48FB1</color>
+    <color name="colorBackgroundTextDevice_4">#EC407A</color>
+    <!--Color Device 5-->
+    <color name="colorBackgroundImageDevice_5">#80DEEA</color>
+    <color name="colorBackgroundTextDevice_5">#26C6DA</color>
+    <!--Color Device 6-->
+    <color name="colorBackgroundImageDevice_6">#B0BEC5</color>
+    <color name="colorBackgroundTextDevice_6">#78909C</color>
+    <!--Color Device 7-->
+    <color name="colorBackgroundImageDevice_7">#FFCC80</color>
+    <color name="colorBackgroundTextDevice_7">#FFA726</color>
+    <!--Color Device 8-->
+    <color name="colorBackgroundImageDevice_8">#BCAAA4</color>
+    <color name="colorBackgroundTextDevice_8">#8D6E63</color>
 
 </resources>

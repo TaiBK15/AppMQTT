@@ -6,11 +6,13 @@
     android:gravity="center">
 
     <ImageView
+        android:id="@+id/img_connection_status"
         android:layout_width="@dimen/size_icon_connection_status"
         android:layout_height="@dimen/size_icon_connection_status"
-        android:src="@drawable/ic_connected"
-        android:background="@drawable/bkg_ic_status_connection"
-        android:backgroundTint="@color/colorBackgroundIconConnected"
         android:layout_gravity="center"/>
 
 </LinearLayout>
+
+
+    <!--android:src="@drawable/ic_connected"-->
+    <!--android:backgroundTint="@color/colorBackgroundIconConnected"-->
