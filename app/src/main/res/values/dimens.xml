@@ -3,14 +3,28 @@
     <!-- Size Circle Background -->
     <dimen name="size_icon_connection_status">200dp</dimen>
 
-    <!-- Padding -->
+                    <!-- Padding -->
+    <!--*************** Device List ************** -->
     <dimen name="padding_device_list">10dp</dimen>
     <dimen name="padding_image_margin_top_device">30dp</dimen>
     <dimen name="padding_text_margin_top_device">20dp</dimen>
     <dimen name="padding_text_content_device">8dp</dimen>
+    <!--*************** Toolbar ************** -->
+    <dimen name="padding_text_start_title_toolbar">25dp</dimen>
+    <!--*************** Setting Dialog ************** -->
+    <dimen name="padding_top_title_dialog">10dp</dimen>
+    <dimen name="height_edit_text">40dp</dimen>
+    <dimen name="padding_margin_element">8dp</dimen>
+    <dimen name="padding_left_edit_text">15dp</dimen>
+    <dimen name="margin_top_edit_text">3dp</dimen>
 
-    <!-- Text size -->
+                    <!-- Text size -->
+    <!--*************** Device List ************** -->
     <dimen name="size_text_device">20dp</dimen>
+    <!--*************** Setting Dialog ************** -->
+    <dimen name="size_text_title_dialog">18dp</dimen>
+    <dimen name="size_text_header_dialog">15dp</dimen>
+
 
 
 

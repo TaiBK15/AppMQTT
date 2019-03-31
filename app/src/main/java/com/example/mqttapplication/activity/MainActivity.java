@@ -1,5 +1,6 @@
 package com.example.mqttapplication.activity;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -7,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 import android.widget.Toast;
 
 import com.example.mqttapplication.R;
@@ -45,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
 
         toolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setIcon(R.drawable.ic_mqtt_app_small);
 
         tablayout = (TabLayout) findViewById(R.id.tablayout_main_activity);
         viewPager = (ViewPager) findViewById(R.id.viewpager_main_activity);
@@ -119,12 +123,20 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if(id == R.id.main_item_menu){
-            Toast.makeText(getApplicationContext(), "Setting menu", Toast.LENGTH_LONG).show();
+//            Toast.makeText(getApplicationContext(), "Setting menu", Toast.LENGTH_LONG).show();
+            dialogConnectSetting();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
 
+    }
+
+    private void dialogConnectSetting(){
+        Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_connetion_setting);
+        dialog.show();
     }
 }
 

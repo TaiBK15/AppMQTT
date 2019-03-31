@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:minHeight="400dp"
+    android:minWidth="320dp"
+    android:orientation="vertical"
+    android:background="@drawable/bkg_dialog_connection_setting">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Connection Setup"
+        android:textColor="@color/textColorPrimary"
+        android:textSize="@dimen/size_text_title_dialog"
+        android:background="@color/colorPrimaryDark"
+        android:gravity="center"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!--An element for setting-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="@dimen/padding_top_title_dialog"
+            android:layout_marginLeft="@dimen/padding_margin_element"
+            android:layout_marginRight="@dimen/padding_margin_element">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="MQTT Hostname/Address"
+                android:textSize="@dimen/size_text_header_dialog"
+                android:layout_marginLeft="@dimen/padding_margin_element"
+                android:textColor="@color/textColorPrimary"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/height_edit_text"
+                android:background="@drawable/bkg_text_dialog"
+                android:textColor="@color/edittextColorDialog"
+                android:paddingLeft="@dimen/padding_left_edit_text"
+                android:layout_marginTop="@dimen/margin_top_edit_text"/>
+
+        </LinearLayout>
+
+        <!--An element for setting-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="@dimen/padding_top_title_dialog"
+            android:layout_marginLeft="@dimen/padding_margin_element"
+            android:layout_marginRight="@dimen/padding_margin_element">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Port"
+                android:textSize="@dimen/size_text_header_dialog"
+                android:textColor="@color/textColorPrimary"
+                android:layout_marginLeft="@dimen/padding_margin_element"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/height_edit_text"
+                android:background="@drawable/bkg_text_dialog"
+                android:textColor="@color/edittextColorDialog"
+                android:paddingLeft="@dimen/padding_left_edit_text"
+                android:layout_marginTop="@dimen/margin_top_edit_text"/>
+
+        </LinearLayout>
+
+        <!--An element for setting-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="@dimen/padding_top_title_dialog"
+            android:layout_marginLeft="@dimen/padding_margin_element"
+            android:layout_marginRight="@dimen/padding_margin_element">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Username"
+                android:textSize="@dimen/size_text_header_dialog"
+                android:textColor="@color/textColorPrimary"
+                android:layout_marginLeft="@dimen/padding_margin_element"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/height_edit_text"
+                android:textColor="@color/edittextColorDialog"
+                android:background="@drawable/bkg_text_dialog"
+                android:paddingLeft="@dimen/padding_left_edit_text"
+                android:layout_marginTop="@dimen/margin_top_edit_text"/>
+
+        </LinearLayout>
+
+        <!--An element for setting-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="@dimen/padding_top_title_dialog"
+            android:layout_marginLeft="@dimen/padding_margin_element"
+            android:layout_marginRight="@dimen/padding_margin_element">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Password"
+                android:textSize="@dimen/size_text_header_dialog"
+                android:textColor="@color/textColorPrimary"
+                android:layout_marginLeft="@dimen/padding_margin_element"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/height_edit_text"
+                android:textColor="@color/edittextColorDialog"
+                android:background="@drawable/bkg_text_dialog"
+                android:paddingLeft="@dimen/padding_left_edit_text"
+                android:layout_marginTop="@dimen/margin_top_edit_text"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="@dimen/padding_margin_element">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorSecondary"
+                android:text="Save"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/textColorPrimary"
+            android:padding="@dimen/padding_margin_element">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Cancel"
+                android:background="@color/colorSecondary"
+                android:textColor="@color/textColorPrimary"/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</LinearLayout>

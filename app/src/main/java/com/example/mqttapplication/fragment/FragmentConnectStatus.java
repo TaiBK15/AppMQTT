@@ -20,7 +20,7 @@ public class FragmentConnectStatus extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragmnet_connect_status, container, false);
+        View view = inflater.inflate(R.layout.fragment_connect_status, container, false);
         imgViewConnStatus = (ImageView) view.findViewById(R.id.img_connection_status);
         //Set icon connected
 //        imgViewConnStatus.setImageResource(R.drawable.ic_connected);

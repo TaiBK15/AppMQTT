@@ -7,6 +7,7 @@
     <color name="colorAccent">#00DCC5</color>
     <!--Color Theme-->
     <color name="textColorPrimary">#FFFFFF</color>
+    <color name="edittextColorDialog">#000000</color>
     <color name="iconColorPrimary">#FFFFFF</color>
     <!--Color Icon Connection Status-->
     <color name="colorBackgroundIconConnected">#00FF00</color>
@@ -35,5 +36,9 @@
     <!--Color Device 8-->
     <color name="colorBackgroundImageDevice_8">#BCAAA4</color>
     <color name="colorBackgroundTextDevice_8">#8D6E63</color>
+
+    <!--Color Stroke for Edit text dialog-->
+    <color name="colorStrokeTextDialog">#CE93D8</color>
+
 
 </resources>
