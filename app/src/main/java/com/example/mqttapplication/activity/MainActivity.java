@@ -47,8 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
         toolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setIcon(R.drawable.ic_mqtt_app_small);
+        toolbar.setLogo(R.drawable.ic_mqtt_app_small);
 
         tablayout = (TabLayout) findViewById(R.id.tablayout_main_activity);
         viewPager = (ViewPager) findViewById(R.id.viewpager_main_activity);

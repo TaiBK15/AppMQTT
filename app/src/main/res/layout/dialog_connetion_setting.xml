@@ -135,6 +135,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="horizontal"
+        android:layout_marginTop="@dimen/padding_top_title_dialog"
         android:weightSum="2">
 
         <LinearLayout
@@ -147,6 +148,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/colorSecondary"
+                android:textColor="@color/textColorPrimary"
                 android:text="Save"/>
 
         </LinearLayout>

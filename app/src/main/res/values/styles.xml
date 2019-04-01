@@ -8,8 +8,14 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+    <style name="Main.Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">25dp</item>
+    </style>
+
+    <style name="Device.Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">20dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingBottom">10dp</item>
     </style>
 
 </resources>

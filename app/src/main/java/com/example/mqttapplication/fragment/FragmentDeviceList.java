@@ -1,5 +1,6 @@
 package com.example.mqttapplication.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.mqttapplication.R;
+import com.example.mqttapplication.activity.DeviceDetailActivity;
 
 public class FragmentDeviceList extends Fragment{
 
@@ -43,7 +45,10 @@ public class FragmentDeviceList extends Fragment{
 
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Click on device 1", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getContext(), DeviceDetailActivity.class);
+                intent.putExtra("Title", "DEVICE 1");
+                intent.putExtra("BkgToolbar",  1);
+                startActivity(intent);
             }
         });
 
@@ -51,7 +56,10 @@ public class FragmentDeviceList extends Fragment{
 
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Click on device 2", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getContext(), DeviceDetailActivity.class);
+                intent.putExtra("Title", "DEVICE 2");
+                intent.putExtra("BkgToolbar",  2);
+                startActivity(intent);
             }
         });
 
@@ -59,7 +67,10 @@ public class FragmentDeviceList extends Fragment{
 
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Click on device 3", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getContext(), DeviceDetailActivity.class);
+                intent.putExtra("Title", "DEVICE 3");
+                intent.putExtra("BkgToolbar",  3);
+                startActivity(intent);
             }
         });
 
@@ -67,7 +78,10 @@ public class FragmentDeviceList extends Fragment{
 
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Click on device 4", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getContext(), DeviceDetailActivity.class);
+                intent.putExtra("Title", "DEVICE 4");
+                intent.putExtra("BkgToolbar",  4);
+                startActivity(intent);
             }
         });
 
@@ -75,15 +89,10 @@ public class FragmentDeviceList extends Fragment{
 
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Click on device 5", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        device_5.setOnClickListener(new View.OnClickListener(){
-
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getContext(), "Click on device 5", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getContext(), DeviceDetailActivity.class);
+                intent.putExtra("Title", "DEVICE 5");
+                intent.putExtra("BkgToolbar",  5);
+                startActivity(intent);
             }
         });
 
@@ -91,7 +100,10 @@ public class FragmentDeviceList extends Fragment{
 
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Click on device 5", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getContext(), DeviceDetailActivity.class);
+                intent.putExtra("Title", "DEVICE 6");
+                intent.putExtra("BkgToolbar",  6);
+                startActivity(intent);
             }
         });
 
@@ -99,7 +111,10 @@ public class FragmentDeviceList extends Fragment{
 
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Click on device 5", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getContext(), DeviceDetailActivity.class);
+                intent.putExtra("Title", "DEVICE 7");
+                intent.putExtra("BkgToolbar",  7);
+                startActivity(intent);
             }
         });
 
@@ -107,7 +122,10 @@ public class FragmentDeviceList extends Fragment{
 
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Click on device 5", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getContext(), DeviceDetailActivity.class);
+                intent.putExtra("Title", "DEVICE 8");
+                intent.putExtra("BkgToolbar",  8);
+                startActivity(intent);
             }
         });
 //        imgView = (ImageView) view.findViewById(R.id.image_test);

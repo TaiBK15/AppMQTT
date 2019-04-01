@@ -17,6 +17,14 @@
     <dimen name="padding_margin_element">8dp</dimen>
     <dimen name="padding_left_edit_text">15dp</dimen>
     <dimen name="margin_top_edit_text">3dp</dimen>
+    <!--*************** Device Detail Element ************** -->
+    <dimen name="margin_left_element">15dp</dimen>
+    <dimen name="margin_top_element">10dp</dimen>
+    <dimen name="height_size_element">200dp</dimen>
+    <dimen name="image_size_element">80dp</dimen>
+
+
+
 
                     <!-- Text size -->
     <!--*************** Device List ************** -->
@@ -24,6 +32,9 @@
     <!--*************** Setting Dialog ************** -->
     <dimen name="size_text_title_dialog">18dp</dimen>
     <dimen name="size_text_header_dialog">15dp</dimen>
+    <!--*************** Device Detail Element ************** -->
+    <dimen name="size_text_element">18dp</dimen>
+    <dimen name="size_number_element">25dp</dimen>
 
 
 

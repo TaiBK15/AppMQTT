@@ -15,7 +15,7 @@
         android:elevation="4dp"
         app:titleMarginStart="@dimen/padding_text_start_title_toolbar"
         app:titleTextColor="@color/colorBackgroundTextDevice_2"
-        app:titleTextAppearance="@style/Toolbar.TitleText"
+        app:titleTextAppearance="@style/Main.Toolbar.TitleText"
         android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     </android.support.v7.widget.Toolbar>
