@@ -16,9 +16,6 @@ import com.example.mqttapplication.activity.DeviceDetailActivity;
 
 public class FragmentDeviceList extends Fragment{
 
-//    AnimationDrawable wifiAnimation;
-//    private ImageView imgView;
-
     private LinearLayout device_1, device_2, device_3, device_4,
                          device_5, device_6, device_7, device_8;
 
@@ -128,10 +125,7 @@ public class FragmentDeviceList extends Fragment{
                 startActivity(intent);
             }
         });
-//        imgView = (ImageView) view.findViewById(R.id.image_test);
-//        imgView.setBackgroundResource(R.drawable.animation_wifi);
-//        wifiAnimation = (AnimationDrawable) imgView.getBackground();
-//        wifiAnimation.start();
+
 
         return view;
     }

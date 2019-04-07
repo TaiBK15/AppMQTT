@@ -12,137 +12,242 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:elevation="4dp"
+        android:layout_marginBottom="@dimen/margin_bottom_toolbar"
         app:subtitleTextColor="@color/textColorPrimary"
         app:titleMarginStart="@dimen/padding_text_start_title_toolbar"
         app:titleTextColor="@color/textColorPrimary"
         app:titleTextAppearance="@style/Device.Toolbar.TitleText"
         android:theme="@style/ThemeOverlay.AppCompat.Dark" />
 
+    <!--***************Switch Light*****************-->
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/height_size_switch"
+        android:layout_marginLeft="@dimen/margin_left_element"
+        android:layout_marginRight="@dimen/margin_left_element"
+        android:layout_marginTop="@dimen/margin_top_element"
+        android:orientation="horizontal"
+        android:elevation="@dimen/elevation_element"
+        android:background="@drawable/bkg_item_device_detail">
+
+        <ImageView
+            android:layout_width="@dimen/switch_size_element"
+            android:layout_height="@dimen/switch_size_element"
+            android:layout_marginLeft="@dimen/margin_left_element"
+            android:src="@drawable/ic_ctrl_light"
+            android:layout_gravity="center_vertical"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textSize="@dimen/size_number_element"
+            android:text="Switch"/>
+
+        <Switch
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="40dp"
+            android:gravity="right|center"
+            android:scaleX="1.25"
+            android:scaleY="1.25"/>
+
+    </LinearLayout>
+
+    <!--%%%%%%%%%%%%%%%%% Sensor Monitor %%%%%%%%%%%%%%%%%%-->
+    <LinearLayout
+        android:id="@+id/ln_sensor"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:weightSum="3"
         android:orientation="horizontal">
 
-    <!--********************Brightness Element*****************-->
+        <!--********************Temperature Element*****************-->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="@dimen/height_size_element"
+            android:layout_height="@dimen/height_size_sensor_monitor"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:gravity="center_vertical"
+            android:elevation="@dimen/elevation_element"
             android:layout_marginLeft="@dimen/margin_left_element"
             android:layout_marginTop="@dimen/margin_top_element"
-            android:background="@color/colorPrimaryDark">
+            android:background="@drawable/bkg_item_device_detail">
 
-            <ImageView
-                android:layout_gravity="center"
-                android:layout_width="@dimen/image_size_element"
-                android:layout_height="@dimen/image_size_element"
-                android:src="@drawable/ic_brightness"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_marginLeft="@dimen/margin_left_image_element"
+                    android:layout_gravity="center"
+                    android:layout_width="@dimen/image_size_element"
+                    android:layout_height="@dimen/image_size_element"
+                    android:src="@drawable/ic_temp"/>
+
+                <TextView
+                    android:id="@+id/tv_temp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_top_edit_text"
+                    android:textSize="@dimen/size_number_element"  />
+
+            </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Brightness"
+                android:text="Temperature"
                 android:textSize="@dimen/size_text_element" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="50%"
-                android:textSize="@dimen/size_number_element" />
+            <ProgressBar
+                android:id="@+id/progressBarTemperature"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="@dimen/margin_top_element"
+                android:layout_marginBottom="@dimen/padding_image_margin_top_device"
+                android:layout_gravity="center"
+                android:max="100"
+                android:progressDrawable="@drawable/vertical_progress_bar_temperature" />
 
         </LinearLayout>
 
-    <!--********************Humidity & Temperature Element*****************-->
+        <!--********************Humidity & Temperature Element*****************-->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="@dimen/height_size_element"
+            android:layout_height="@dimen/height_size_sensor_monitor"
             android:orientation="vertical"
             android:weightSum="2"
+            android:layout_marginLeft="@dimen/margin_left_element"
+            android:layout_marginRight="@dimen/margin_left_element"
+            android:layout_marginTop="@dimen/margin_top_element"
             android:layout_weight="2">
+
+            <!--********************Brightness Element*****************-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:elevation="@dimen/elevation_element"
+                android:orientation="vertical"
+                android:background="@drawable/bkg_item_device_detail">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_horizontal">
+
+                    <ImageView
+                        android:layout_width="@dimen/image_size_element"
+                        android:layout_height="@dimen/image_size_element"
+                        android:padding="@dimen/padding_image_element"
+                        android:src="@drawable/ic_brightness" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="Brightness"
+                        android:textSize="@dimen/size_text_element"/>
+
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal">
+
+                    <ProgressBar
+                        android:id="@+id/progressBarBrightness"
+                        android:layout_centerInParent="true"
+                        android:layout_width="180dp"
+                        android:layout_height="180dp"
+                        android:layout_marginTop="@dimen/margin_top_element"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:background="@drawable/circle_shape"
+                        android:indeterminate="false"
+                        android:max="100"
+                        android:rotation="-90"
+                        android:progressDrawable="@drawable/circular_progress_bar_brightness" />
+
+                    <TextView
+                        android:id="@+id/tv_progressBarBrightness"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="85%"
+                        android:textSize="@dimen/size_number_element"
+                        android:background="@color/colorTransparent"/>
+
+                </RelativeLayout>
+
+            </LinearLayout>
 
             <!--********************Humidity Element*****************-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:orientation="horizontal"
-                android:layout_marginLeft="@dimen/margin_left_element"
                 android:layout_marginTop="@dimen/margin_top_element"
-                android:background="@color/colorPrimaryDark"
-                android:gravity="center_horizontal">
-
-                <ImageView
-                    android:layout_width="@dimen/image_size_element"
-                    android:layout_height="@dimen/image_size_element"
-                    android:src="@drawable/ic_humidity"
-                    android:layout_marginRight="@dimen/margin_left_element"/>
+                android:orientation="vertical"
+                android:elevation="@dimen/elevation_element"
+                android:background="@drawable/bkg_item_device_detail">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"
-                    android:orientation="vertical">
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_horizontal">
+
+                    <ImageView
+                        android:layout_width="@dimen/image_size_element"
+                        android:layout_height="@dimen/image_size_element"
+                        android:padding="@dimen/padding_image_element"
+                        android:src="@drawable/ic_humidity" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
                         android:text="Humidity"
                         android:textSize="@dimen/size_text_element"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="60%"
-                        android:textSize="@dimen/size_number_element"/>
-
                 </LinearLayout>
 
-            </LinearLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal">
 
-            <!--********************Temperature Element*****************-->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="horizontal"
-                android:layout_marginLeft="@dimen/margin_left_element"
-                android:layout_marginTop="@dimen/margin_top_element"
-                android:background="@color/colorPrimaryDark"
-                android:gravity="center_horizontal">
-
-                <ImageView
-                    android:layout_width="@dimen/image_size_element"
-                    android:layout_height="@dimen/image_size_element"
-                    android:src="@drawable/ic_temp"
-                    android:layout_marginRight="@dimen/margin_left_element"/>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"
-                    android:orientation="vertical">
+                    <ProgressBar
+                        android:id="@+id/progressBarHumidity"
+                        android:layout_centerInParent="true"
+                        android:layout_width="180dp"
+                        android:layout_height="180dp"
+                        android:layout_marginTop="@dimen/margin_top_element"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:background="@drawable/circle_shape"
+                        android:indeterminate="false"
+                        android:max="100"
+                        android:rotation="-90"
+                        android:progressDrawable="@drawable/circular_progress_bar_humidity" />
 
                     <TextView
+                        android:id="@+id/tv_progressBarHumidity"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Temperature"
-                        android:textSize="@dimen/size_text_element"/>
+                        android:layout_centerInParent="true"
+                        android:text="85%"
+                        android:textSize="@dimen/size_number_element"
+                        android:background="@color/colorTransparent"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="25C"
-                        android:textSize="@dimen/size_number_element"/>
-
-                </LinearLayout>
+                </RelativeLayout>
 
             </LinearLayout>
-
 
         </LinearLayout>
 

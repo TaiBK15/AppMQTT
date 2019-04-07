@@ -9,20 +9,25 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.example.mqttapplication.R;
 
 public class DeviceDetailActivity extends AppCompatActivity {
+    private final String TAG = this.getClass().getSimpleName();
     private Toolbar devicetoolbar;
     private String title;
     private int background;
-    private final String TAG = this.getClass().getSimpleName();
+    ProgressBar proBarHumidity, proBarBrightness, proBarTemperature;
+    TextView tv_proBarHumidity, tv_proBarBrightness, tv_temp;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_detail);
 
+        //Get data from Fragment Device List
         Intent intent = getIntent();
         title = intent.getStringExtra("Title");
         background = intent.getIntExtra("BkgToolbar", 0);
@@ -31,8 +36,30 @@ public class DeviceDetailActivity extends AppCompatActivity {
         setSupportActionBar(devicetoolbar);
         getSupportActionBar().setTitle(title);
         devicetoolbar.setSubtitle("Connect to " + "mainserver.com");
+
         //Call function to set background for Toolbar
         setBackgroundToolbar(background);
+
+        //Set data for sensor Temperature
+        proBarTemperature = findViewById(R.id.progressBarTemperature);
+        tv_temp = findViewById(R.id.tv_temp);
+        proBarTemperature.setProgress(100);
+        tv_temp.setText(100 + "\u2103");
+
+        //Set data for sensor Brightness
+        proBarBrightness = findViewById(R.id.progressBarBrightness);
+        tv_proBarBrightness = findViewById(R.id.tv_progressBarBrightness);
+        proBarBrightness.setProgress(70);
+        tv_proBarBrightness.setText("" + 70 + "%");
+
+        //Set data for sensor Humidity
+        proBarHumidity = findViewById(R.id.progressBarHumidity);
+        tv_proBarHumidity = findViewById(R.id.tv_progressBarHumidity);
+        proBarHumidity.setProgress(50);
+        tv_proBarHumidity.setText("" + 50 + "%");
+
+
+
 
     }
 
