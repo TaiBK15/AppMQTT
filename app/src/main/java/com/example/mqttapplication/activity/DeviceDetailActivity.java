@@ -1,6 +1,7 @@
 package com.example.mqttapplication.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -17,7 +18,7 @@ import com.example.mqttapplication.R;
 public class DeviceDetailActivity extends AppCompatActivity {
     private final String TAG = this.getClass().getSimpleName();
     private Toolbar devicetoolbar;
-    private String title;
+    private String title, hostname;
     private int background;
     ProgressBar proBarHumidity, proBarBrightness, proBarTemperature;
     TextView tv_proBarHumidity, tv_proBarBrightness, tv_temp;
@@ -32,10 +33,14 @@ public class DeviceDetailActivity extends AppCompatActivity {
         title = intent.getStringExtra("Title");
         background = intent.getIntExtra("BkgToolbar", 0);
 
+        //Get data from Share Preferences
+        SharedPreferences mqttConnInfo = getSharedPreferences("MQTTConnectionSetup", MODE_PRIVATE);
+        hostname = mqttConnInfo.getString("MQTT_Hostname", "");
+
         devicetoolbar = findViewById(R.id.device_detail_toolbar);
         setSupportActionBar(devicetoolbar);
         getSupportActionBar().setTitle(title);
-        devicetoolbar.setSubtitle("Connect to " + "mainserver.com");
+        devicetoolbar.setSubtitle("Connect to " + hostname);
 
         //Call function to set background for Toolbar
         setBackgroundToolbar(background);

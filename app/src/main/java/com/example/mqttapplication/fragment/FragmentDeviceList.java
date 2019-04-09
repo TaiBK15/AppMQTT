@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +14,11 @@ import android.widget.Toast;
 
 import com.example.mqttapplication.R;
 import com.example.mqttapplication.activity.DeviceDetailActivity;
+import com.example.mqttapplication.activity.MainActivity;
 
 public class FragmentDeviceList extends Fragment{
 
+    private String hostname;
     private LinearLayout device_1, device_2, device_3, device_4,
                          device_5, device_6, device_7, device_8;
 
@@ -45,6 +48,7 @@ public class FragmentDeviceList extends Fragment{
                 Intent intent = new Intent(getContext(), DeviceDetailActivity.class);
                 intent.putExtra("Title", "DEVICE 1");
                 intent.putExtra("BkgToolbar",  1);
+                intent.putExtra("Hostname", hostname);
                 startActivity(intent);
             }
         });

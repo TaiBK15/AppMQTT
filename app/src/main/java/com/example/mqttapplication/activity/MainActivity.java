@@ -1,14 +1,23 @@
 package com.example.mqttapplication.activity;
 
 import android.app.Dialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.Toolbar;
+import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.mqttapplication.R;
@@ -21,6 +30,12 @@ public class MainActivity extends AppCompatActivity {
     private TabLayout tablayout;
     private ViewPager viewPager;
     private Toolbar toolbar;
+    private EditText edt_hostname, edt_port, edt_username, edt_password;
+    private Button btn_save, btn_cancel;
+    private CheckBox checkbox;
+    private String hostname, port, username, password;
+    private boolean chkShowPassword;
+
 
 //    public MqttAndroidClient mqttAndroidClient;
 //
@@ -122,7 +137,6 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if(id == R.id.main_item_menu){
-//            Toast.makeText(getApplicationContext(), "Setting menu", Toast.LENGTH_LONG).show();
             dialogConnectSetting();
             return true;
         }
@@ -131,11 +145,96 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Interact with setting MQTT connection dialog
+     */
     private void dialogConnectSetting(){
-        Dialog dialog = new Dialog(this);
+        final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_connetion_setting);
+
+        edt_hostname = (EditText) dialog.findViewById(R.id.edt_hostname);
+        edt_port = (EditText) dialog.findViewById(R.id.edt_port);
+        edt_username = (EditText) dialog.findViewById(R.id.edt_username);
+        edt_password = (EditText) dialog.findViewById(R.id.edt_password);
+        checkbox = (CheckBox) dialog.findViewById(R.id.checkbox);
+        btn_save = (Button) dialog.findViewById(R.id.btn_save);
+        btn_cancel = (Button) dialog.findViewById(R.id.btn_cancel);
+
+        //Restore data connection from share preferences
+        SharedPreferences mqttConnInfo = getSharedPreferences("MQTTConnectionSetup", MODE_PRIVATE);
+        hostname = mqttConnInfo.getString("MQTT_Hostname", "");
+        port = mqttConnInfo.getString("port", "");
+        username = mqttConnInfo.getString("username", "");
+        password = mqttConnInfo.getString("password", "");
+        chkShowPassword = mqttConnInfo.getBoolean("show_password", false);
+
+        //Set data for edit text and checkbox
+        edt_hostname.setText(hostname);
+        edt_port.setText(port);
+        edt_username.setText(username);
+        edt_password.setText(password);
+        checkbox.setChecked(chkShowPassword);
+
+        //Show and hide password
+        if (chkShowPassword)
+            edt_password.setTransformationMethod(null);
+        else
+            edt_password.setTransformationMethod(new PasswordTransformationMethod());
+
+        //Set click on checkbox
+        checkbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Show and hide password
+                if (checkbox.isChecked())
+                    edt_password.setTransformationMethod(null);
+                else
+                    edt_password.setTransformationMethod(new PasswordTransformationMethod());
+            }
+        });
+
+        //Set click on button Save
+        btn_save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hostname = edt_hostname.getText().toString();
+                port = edt_port.getText().toString();
+                username = edt_username.getText().toString();
+                password = edt_password.getText().toString();
+                chkShowPassword = checkbox.isChecked();
+                savingPreferences();
+                dialog.cancel();
+            }
+        });
+
+        //Set click on button Cancel
+        btn_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.cancel();
+            }
+        });
+
         dialog.show();
+    }
+
+    /**
+     * Save data into share preferences
+     */
+    private void savingPreferences(){
+        SharedPreferences mqttConnInfo = getSharedPreferences("MQTTConnectionSetup", MODE_PRIVATE);
+        SharedPreferences.Editor saveData = mqttConnInfo.edit();
+        saveData.putString("MQTT_Hostname", hostname);
+        saveData.putString("port", port);
+        saveData.putString("username",username);
+        saveData.putString("password", password);
+        saveData.putBoolean("show_password", chkShowPassword);
+        saveData.commit();
+    }
+
+    public String getHostname() {
+        return hostname;
     }
 }
 

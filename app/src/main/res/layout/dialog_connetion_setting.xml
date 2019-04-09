@@ -9,7 +9,7 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="@dimen/height_title"
         android:text="Connection Setup"
         android:textColor="@color/textColorPrimary"
         android:textSize="@dimen/size_text_title_dialog"
@@ -39,6 +39,7 @@
                 android:textColor="@color/textColorPrimary"/>
 
             <EditText
+                android:id="@+id/edt_hostname"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/height_edit_text"
                 android:background="@drawable/bkg_text_dialog"
@@ -66,6 +67,7 @@
                 android:layout_marginLeft="@dimen/padding_margin_element"/>
 
             <EditText
+                android:id="@+id/edt_port"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/height_edit_text"
                 android:background="@drawable/bkg_text_dialog"
@@ -93,6 +95,7 @@
                 android:layout_marginLeft="@dimen/padding_margin_element"/>
 
             <EditText
+                android:id="@+id/edt_username"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/height_edit_text"
                 android:textColor="@color/edittextColorDialog"
@@ -120,6 +123,7 @@
                 android:layout_marginLeft="@dimen/padding_margin_element"/>
 
             <EditText
+                android:id="@+id/edt_password"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/height_edit_text"
                 android:textColor="@color/edittextColorDialog"
@@ -129,13 +133,20 @@
 
         </LinearLayout>
 
+        <CheckBox
+            android:id="@+id/checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/padding_left_edit_text"
+            android:layout_marginTop="@dimen/margin_top_edit_text"
+            android:text="Show password"/>
+
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="horizontal"
-        android:layout_marginTop="@dimen/padding_top_title_dialog"
         android:weightSum="2">
 
         <LinearLayout
@@ -145,6 +156,7 @@
             android:padding="@dimen/padding_margin_element">
 
             <Button
+                android:id="@+id/btn_save"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/colorSecondary"

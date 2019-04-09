@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryDark"
+    android:orientation="vertical"
     android:gravity="center">
 
     <ImageView
@@ -14,5 +15,3 @@
 </LinearLayout>
 
 
-    <!--android:src="@drawable/ic_connected"-->
-    <!--android:backgroundTint="@color/colorBackgroundIconConnected"-->

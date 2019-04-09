@@ -12,8 +12,9 @@
     <!--*************** Toolbar ************** -->
     <dimen name="padding_text_start_title_toolbar">25dp</dimen>
     <!--*************** Setting Dialog ************** -->
-    <dimen name="padding_top_title_dialog">10dp</dimen>
+    <dimen name="padding_top_title_dialog">8dp</dimen>
     <dimen name="height_edit_text">40dp</dimen>
+    <dimen name="height_title">40dp</dimen>
     <dimen name="padding_margin_element">8dp</dimen>
     <dimen name="padding_left_edit_text">15dp</dimen>
     <dimen name="margin_top_edit_text">3dp</dimen>
