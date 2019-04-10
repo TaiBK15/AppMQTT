@@ -18,38 +18,30 @@ import java.io.UnsupportedEncodingException;
 
 public class MqttApi {
 
-    final String hostserver = "tcp://m10.cloudmqtt.com:10452";
-    final String clientID = "mqtttest";
-    final String username = "asxdszmm";
-    final String password = "NJw3kQLh_Mze";
-    final String publish_topic = "DOWNLINK";
-    final String subcribe_topic = "UPLINK";
-    public MqttAndroidClient mqttAndroidClient;
-    public boolean flag = true;
-    private String Tag = "MqttApplication";
-    public Isconnect isconn;
+    final String TAG = "MQTT API";
+    final String clientID = "APP MQTT";
+    private String hostserver, username, password;
+    private String publish_topic, subscribe_topic;
+    private MqttAndroidClient mqttAndroidClient;
 
-    public MqttApi(Context context) {
+//    final String hostserver = "tcp://m10.cloudmqtt.com:10452";
+//    final String username = "asxdszmm";
+//    final String password = "NJw3kQLh_Mze";
+//    final String publish_topic = "DOWNLINK";
+//    final String subcribe_topic = "UPLINK";
+
+
+    public MqttAndroidClient getMqttAndroidClient() {
+        return mqttAndroidClient;
+    }
+
+    public MqttApi(Context context, String hostserver, String username, String password) {
+        this.hostserver = hostserver;
+        this.username = username;
+        this.password = password;
+        //Connect to MQTT broker
         mqttAndroidClient = new MqttAndroidClient(context, hostserver, clientID);
-        mqttAndroidClient.setCallback(new MqttCallbackExtended() {
-            @Override
-            public void connectComplete(boolean b, String s) {
-            }
-
-            @Override
-            public void connectionLost(Throwable throwable) {
-
-            }
-
-            @Override
-            public void messageArrived(String topic, MqttMessage mqttMessage) {
-            }
-
-            @Override
-            public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
-
-            }
-        });
+        connect();
     }
 
     public void setCallback(MqttCallbackExtended callback) {
@@ -58,18 +50,14 @@ public class MqttApi {
 
     public void connect() {
 
-        final MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
+        MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
         mqttConnectOptions.setAutomaticReconnect(true);
         mqttConnectOptions.setCleanSession(false);
         mqttConnectOptions.setUserName(username);
         mqttConnectOptions.setPassword(password.toCharArray());
-        Log.d(Tag, "Wait to process 1");
-
         try {
-            Log.d(Tag, "Wait to process 2");
 
             mqttAndroidClient.connect(mqttConnectOptions, null, new IMqttActionListener() {
-
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
 
@@ -79,56 +67,22 @@ public class MqttApi {
                     disconnectedBufferOptions.setPersistBuffer(false);
                     disconnectedBufferOptions.setDeleteOldestMessages(false);
                     mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
-//                    publishMessage(mqttAndroidClient, "TestMQTT", 0, publish_topic);
-//                    subscribe(mqttAndroidClient, subcribe_topic, 0);
-                    sendMessage();
-                    Log.d(Tag, "Connected");
-                    try {
-                        isconn.inform("Connected");
-
-                    } catch (NullPointerException e) {
-                        e.printStackTrace();
-                    }
+                    Log.d(TAG, "Connected MQTT successfully");
+                    publish(mqttAndroidClient, "TestMQTT", 0, "TestAPPMQTT");
+                    subscribe(mqttAndroidClient, "testAPP", 0);
                 }
-
 
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-//                    Toast.makeText(this, "failed to connect", Toast.LENGTH_LONG).show();
-                    Log.d(Tag, "Fail to connect");
-                    try {
-                        isconn.inform("Fail to connect. Check your network");
-
-                    } catch (NullPointerException e) {
-                        e.printStackTrace();
-                    }
-//                    return false;
                 }
-
             });
-            Log.d(Tag, "Wait to process 3");
 
         } catch (MqttException ex) {
             ex.printStackTrace();
         }
-
-        Log.d(Tag, "connected 2");
-//        if (flag == true) {
-//            Log.d(Tag, "connected 2");
-//            return true;
-//        }
-//        else
-//        {
-//            Log.d(Tag, "Fail to connect");
-//            return false;
-//        }
     }
 
-    public void sendMessage() {
-        publishMessage(mqttAndroidClient, "TestMQTT", 0, publish_topic);
-
-    }
-    public void publishMessage(@NonNull MqttAndroidClient client,
+    private void publish(@NonNull MqttAndroidClient client,
                                @NonNull String msg, int qos, @NonNull String topic) {
         try {
             byte[] encodedPayload = new byte[0];
@@ -146,7 +100,7 @@ public class MqttApi {
 
     }
 
-    public void subscribe(@NonNull MqttAndroidClient client,
+    private void subscribe(@NonNull MqttAndroidClient client,
                           @NonNull final String topic, int qos) {
         try {
             IMqttToken token = client.subscribe(topic, qos);
@@ -154,12 +108,10 @@ public class MqttApi {
 
                 @Override
                 public void onSuccess(IMqttToken iMqttToken) {
-//              Toast.makeText(this, "Subscribe successfully", Toast.LENGTH_LONG).show();
                 }
 
                 @Override
                 public void onFailure(IMqttToken iMqttToken, Throwable throwable) {
-//                Toast.makeText(this, "Subscribe fail", Toast.LENGTH_LONG).show();
 
                 }
             });
@@ -175,12 +127,10 @@ public class MqttApi {
         token.setActionCallback(new IMqttActionListener() {
             @Override
             public void onSuccess(IMqttToken iMqttToken) {
-//                Toast.makeText(this, "Unsubscribe successfully", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onFailure(IMqttToken iMqttToken, Throwable throwable) {
-//                Toast.makeText(this, "Unsubscribe fail", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -191,18 +141,26 @@ public class MqttApi {
         mqttToken.setActionCallback(new IMqttActionListener() {
             @Override
             public void onSuccess(IMqttToken iMqttToken) {
-//                Toast.makeText(this, "Disconnect successfully", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onFailure(IMqttToken iMqttToken, Throwable throwable) {
-//                Toast.makeText(this, "Disconnect fail", Toast.LENGTH_LONG).show();
             }
         });
     }
 
-    public interface Isconnect {
-        void inform(String mess);
+    /**
+     * Sumup: Rewrite method publish to topic
+     */
+    public void publishToTopic(String mess, int qos, String topic){
+        publish(mqttAndroidClient, mess, qos, topic);
+    }
+
+    /**
+     * Sumup: Rewrite method subscribe to topic
+     */
+    public void subscribeToTopic(String topic, int qos){
+        subscribe(mqttAndroidClient, topic, qos);
     }
 
 }

@@ -25,7 +25,15 @@ import com.example.mqttapplication.adapter.ViewPagerAdapter;
 import com.example.mqttapplication.fragment.FragmentConnectStatus;
 import com.example.mqttapplication.fragment.FragmentDeviceList;
 
+import org.eclipse.paho.android.service.MqttAndroidClient;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+
+import mqttsrc.MqttApi;
+
 public class MainActivity extends AppCompatActivity {
+    static final String TAG = "MainActivity";
 
     private TabLayout tablayout;
     private ViewPager viewPager;
@@ -35,8 +43,6 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox checkbox;
     private String hostname, port, username, password;
     private boolean chkShowPassword;
-
-
 //    public MqttAndroidClient mqttAndroidClient;
 //
 //    final String hostserver = "tcp://m10.cloudmqtt.com:10452";
@@ -45,15 +51,6 @@ public class MainActivity extends AppCompatActivity {
 //    final String password = "NJw3kQLh_Mze";
 //    final String publish_topic = "DOWNLINK";
 //    final String subcribe_topic = "UPLINK";
-
-//    boolean flag_conn;
-//
-//    MqttApi mqttclient;
-//    TextView datarecv;
-//    Button conn, disconn, send;
-//
-//    public MainActivity() {
-//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -231,10 +228,38 @@ public class MainActivity extends AppCompatActivity {
         saveData.putString("password", password);
         saveData.putBoolean("show_password", chkShowPassword);
         saveData.commit();
+        startMQTT();
     }
 
-    public String getHostname() {
-        return hostname;
+    /**
+     * Start MQTT connection
+     */
+    private void startMQTT(){
+        String hostserver = "tcp://" + hostname + ":" + port;
+        MqttApi mqttApi = new MqttApi(getApplicationContext(), hostserver, username, password);
+        MqttAndroidClient mqttAndroidClient = mqttApi.getMqttAndroidClient();
+        mqttApi.setCallback(new MqttCallbackExtended() {
+            @Override
+            public void connectComplete(boolean reconnect, String serverURI) {
+
+            }
+
+            @Override
+            public void connectionLost(Throwable cause) {
+
+            }
+
+            @Override
+            public void messageArrived(String topic, MqttMessage message) throws Exception {
+                Log.w(TAG, message.toString());
+            }
+
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken token) {
+
+            }
+        });
+
     }
 }
 

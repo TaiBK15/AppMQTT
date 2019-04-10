@@ -63,9 +63,6 @@ public class DeviceDetailActivity extends AppCompatActivity {
         proBarHumidity.setProgress(50);
         tv_proBarHumidity.setText("" + 50 + "%");
 
-
-
-
     }
 
     private void setBackgroundToolbar(int colorNum){
