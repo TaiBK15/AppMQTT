@@ -10,23 +10,36 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.example.mqttapplication.R;
 
+import mqttsrc.MqttApi;
+
 public class DeviceDetailActivity extends AppCompatActivity {
     private final String TAG = this.getClass().getSimpleName();
-    private Toolbar devicetoolbar;
+    private Toolbar deviceToolbar;
     private String title, hostname;
     private int background;
+    private boolean connStatus;
     ProgressBar proBarHumidity, proBarBrightness, proBarTemperature;
     TextView tv_proBarHumidity, tv_proBarBrightness, tv_temp;
+    Switch sw_light;
+    MqttApi mqttApi;
+
+//    private OnClickSwitchListener onClick;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_detail);
+
+        //Get mqttApi object from MainActivity
+        MainActivity mainActivity = new MainActivity();
+        mqttApi = mainActivity.getMqttApi();
 
         //Get data from Fragment Device List
         Intent intent = getIntent();
@@ -36,11 +49,17 @@ public class DeviceDetailActivity extends AppCompatActivity {
         //Get data from Share Preferences
         SharedPreferences mqttConnInfo = getSharedPreferences("MQTTConnectionSetup", MODE_PRIVATE);
         hostname = mqttConnInfo.getString("MQTT_Hostname", "");
+        connStatus = mqttConnInfo.getBoolean("connStatus", false);
 
-        devicetoolbar = findViewById(R.id.device_detail_toolbar);
-        setSupportActionBar(devicetoolbar);
+        //Set data for toolbar
+        deviceToolbar = findViewById(R.id.device_detail_toolbar);
+        setSupportActionBar(deviceToolbar);
         getSupportActionBar().setTitle(title);
-        devicetoolbar.setSubtitle("Connect to " + hostname);
+        if(connStatus)
+            deviceToolbar.setSubtitle("Connect to " + hostname);
+        else
+            deviceToolbar.setSubtitle("Not found broker MQTT");
+
 
         //Call function to set background for Toolbar
         setBackgroundToolbar(background);
@@ -63,36 +82,56 @@ public class DeviceDetailActivity extends AppCompatActivity {
         proBarHumidity.setProgress(50);
         tv_proBarHumidity.setText("" + 50 + "%");
 
+        //Set on click switch
+        sw_light = findViewById(R.id.sw_light);
+        sw_light.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean state = sw_light.isChecked();
+//                mqttApi.publishToTopic(title, 0, "AppMQTT");
+//                if(onClick == null)
+//                    Log.d(TAG, "interface null");
+//                else
+//                    onClick.onClickSwitch(title, state);
+
+
+            }
+        });
+
     }
 
+    /**
+     * set background for toolbar with each device
+     * @param colorNum
+     */
     private void setBackgroundToolbar(int colorNum){
         switch(background){
             case 1:
-                devicetoolbar.setBackgroundResource(R.color.colorBackgroundTextDevice_1);
+                deviceToolbar.setBackgroundResource(R.color.colorBackgroundTextDevice_1);
                 break;
             case 2:
-                devicetoolbar.setBackgroundResource(R.color.colorBackgroundTextDevice_2);
+                deviceToolbar.setBackgroundResource(R.color.colorBackgroundTextDevice_2);
                 break;
             case 3:
-                devicetoolbar.setBackgroundResource(R.color.colorBackgroundTextDevice_3);
+                deviceToolbar.setBackgroundResource(R.color.colorBackgroundTextDevice_3);
                 break;
             case 4:
-                devicetoolbar.setBackgroundResource(R.color.colorBackgroundTextDevice_4);
+                deviceToolbar.setBackgroundResource(R.color.colorBackgroundTextDevice_4);
                 break;
             case 5:
-                devicetoolbar.setBackgroundResource(R.color.colorBackgroundTextDevice_5);
+                deviceToolbar.setBackgroundResource(R.color.colorBackgroundTextDevice_5);
                 break;
             case 6:
-                devicetoolbar.setBackgroundResource(R.color.colorBackgroundTextDevice_6);
+                deviceToolbar.setBackgroundResource(R.color.colorBackgroundTextDevice_6);
                 break;
             case 7:
-                devicetoolbar.setBackgroundResource(R.color.colorBackgroundTextDevice_7);
+                deviceToolbar.setBackgroundResource(R.color.colorBackgroundTextDevice_7);
                 break;
             case 8:
-                devicetoolbar.setBackgroundResource(R.color.colorBackgroundTextDevice_8);
+                deviceToolbar.setBackgroundResource(R.color.colorBackgroundTextDevice_8);
                 break;
             default:
-                devicetoolbar.setBackgroundResource(R.color.colorBackgroundTextDevice_8);
+                deviceToolbar.setBackgroundResource(R.color.colorBackgroundTextDevice_8);
 
         }
     }
@@ -116,4 +155,12 @@ public class DeviceDetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
 
     }
+
+//    public final void setOnClick(OnClickSwitchListener onClick){
+//        this.onClick = onClick;
+//    }
+//
+//    interface OnClickSwitchListener{
+//        void onClickSwitch(String deviceName, boolean on_off);
+//    }
 }

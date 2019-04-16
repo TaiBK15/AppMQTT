@@ -1,13 +1,12 @@
 package com.example.mqttapplication.activity;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.Toolbar;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
@@ -28,6 +27,7 @@ import com.example.mqttapplication.fragment.FragmentDeviceList;
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import mqttsrc.MqttApi;
@@ -43,19 +43,18 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox checkbox;
     private String hostname, port, username, password;
     private boolean chkShowPassword;
-//    public MqttAndroidClient mqttAndroidClient;
-//
-//    final String hostserver = "tcp://m10.cloudmqtt.com:10452";
-//    final String clientID = "mqtttest";
-//    final String username = "asxdszmm";
-//    final String password = "NJw3kQLh_Mze";
-//    final String publish_topic = "DOWNLINK";
-//    final String subcribe_topic = "UPLINK";
+
+    private MqttAndroidClient mqttAndroidClient;
+    private MqttApi mqttApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Connect to mqtt server in the first time
+        restorePreference();
+        startMQTT();
 
         toolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
@@ -77,50 +76,8 @@ public class MainActivity extends AppCompatActivity {
         tablayout.getTabAt(1).setIcon(R.drawable.ic_list);
 
 
-
     }
 
-//    private void startMqtt() {
-////        mqttAndroidClient = new MqttAndroidClient(getApplicationContext(), hostserver, clientID);
-//        mqttclient = new MqttApi(getApplicationContext());
-//        mqttclient.isconn = this;
-//        mqttclient.connect();
-////        mqttclient.publishMessage(mqttAndroidClient, clientID, 0, publish_topic);
-//
-////        Toast.makeText(this, "Connected", Toast.LENGTH_LONG).show();
-//
-//        mqttclient.setCallback(new MqttCallbackExtended() {
-//            @Override
-//            public void connectComplete(boolean reconnect, String serverURI) {
-//
-//            }
-//
-//            @Override
-//            public void connectionLost(Throwable cause) {
-//
-//            }
-//
-//            @Override
-//            public void messageArrived(String topic, MqttMessage message) {
-//                datarecv.setText(message.toString());
-//            }
-//
-//            @Override
-//            public void deliveryComplete(IMqttDeliveryToken token) {
-//
-//            }
-//        });
-////        if(flag_conn == true)
-////            Toast.makeText(this, "Connected", Toast.LENGTH_LONG).show();
-////        else
-////            Toast.makeText(this, "fail to connect", Toast.LENGTH_LONG).show();
-//    }
-//
-//
-//    @Override
-//    public void inform(String mess) {
-//        Toast.makeText(MainActivity.this, mess, Toast.LENGTH_LONG).show();
-//    }
 
 
     @Override
@@ -135,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
         if(id == R.id.main_item_menu){
             dialogConnectSetting();
+//            dialogConnectAnimation();
             return true;
         }
 
@@ -148,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
     private void dialogConnectSetting(){
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.dialog_connetion_setting);
+        dialog.setContentView(R.layout.dialog_connection_setting);
 
         edt_hostname = (EditText) dialog.findViewById(R.id.edt_hostname);
         edt_port = (EditText) dialog.findViewById(R.id.edt_port);
@@ -159,12 +117,7 @@ public class MainActivity extends AppCompatActivity {
         btn_cancel = (Button) dialog.findViewById(R.id.btn_cancel);
 
         //Restore data connection from share preferences
-        SharedPreferences mqttConnInfo = getSharedPreferences("MQTTConnectionSetup", MODE_PRIVATE);
-        hostname = mqttConnInfo.getString("MQTT_Hostname", "");
-        port = mqttConnInfo.getString("port", "");
-        username = mqttConnInfo.getString("username", "");
-        password = mqttConnInfo.getString("password", "");
-        chkShowPassword = mqttConnInfo.getBoolean("show_password", false);
+        restorePreference();
 
         //Set data for edit text and checkbox
         edt_hostname.setText(hostname);
@@ -188,6 +141,8 @@ public class MainActivity extends AppCompatActivity {
                     edt_password.setTransformationMethod(null);
                 else
                     edt_password.setTransformationMethod(new PasswordTransformationMethod());
+
+                edt_password.setSelection(edt_password.getText().length());
             }
         });
 
@@ -200,8 +155,25 @@ public class MainActivity extends AppCompatActivity {
                 username = edt_username.getText().toString();
                 password = edt_password.getText().toString();
                 chkShowPassword = checkbox.isChecked();
-                savingPreferences();
-                dialog.cancel();
+
+                if(hostname.equals("")){
+                    Toast.makeText(getApplicationContext(), "Please enter hostname", Toast.LENGTH_LONG).show();
+                }
+                else if(port.equals("")){
+                    Toast.makeText(getApplicationContext(), "Please enter port", Toast.LENGTH_LONG).show();
+                }
+                else if(username.equals("")){
+                    Toast.makeText(getApplicationContext(), "Please enter username", Toast.LENGTH_LONG).show();
+                }
+                else if(password.equals("")){
+                    Toast.makeText(getApplicationContext(), "Please enter password", Toast.LENGTH_LONG).show();
+                }
+                else {
+                    savingPreferences();
+                    dialog.cancel();
+                    startMQTT();
+                    dialogConnectAnimation();
+                }
             }
         });
 
@@ -217,6 +189,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * Create connect animation dialog
+     */
+    private void dialogConnectAnimation(){
+        Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_connect_animation);
+        dialog.show();
+
+    }
+
+    /**
      * Save data into share preferences
      */
     private void savingPreferences(){
@@ -228,30 +211,67 @@ public class MainActivity extends AppCompatActivity {
         saveData.putString("password", password);
         saveData.putBoolean("show_password", chkShowPassword);
         saveData.commit();
-        startMQTT();
+    }
+
+    /**
+     * Restore data from share preference
+     */
+    private void restorePreference(){
+        SharedPreferences mqttConnInfo = getSharedPreferences("MQTTConnectionSetup", MODE_PRIVATE);
+        hostname = mqttConnInfo.getString("MQTT_Hostname", "");
+        port = mqttConnInfo.getString("port", "");
+        username = mqttConnInfo.getString("username", "");
+        password = mqttConnInfo.getString("password", "");
+        chkShowPassword = mqttConnInfo.getBoolean("show_password", false);
     }
 
     /**
      * Start MQTT connection
      */
     private void startMQTT(){
+
+        //To avoid creating many thread mqtt conflict together
+        //Disconnect the previous MQTT client to get new connection
+        if(mqttAndroidClient != null) {
+            try {
+                mqttApi.disconnect(mqttAndroidClient);
+            } catch (MqttException e) {
+                e.printStackTrace();
+            }
+        }
+
         String hostserver = "tcp://" + hostname + ":" + port;
-        MqttApi mqttApi = new MqttApi(getApplicationContext(), hostserver, username, password);
-        MqttAndroidClient mqttAndroidClient = mqttApi.getMqttAndroidClient();
+        mqttApi = new MqttApi(getApplicationContext(), hostserver, username, password);
+        mqttApi.connect();
+
+        mqttAndroidClient = mqttApi.getMqttAndroidClient();
+
         mqttApi.setCallback(new MqttCallbackExtended() {
             @Override
             public void connectComplete(boolean reconnect, String serverURI) {
-
+                boolean isConnected = mqttAndroidClient.isConnected();
+                //Save connect status
+                getApplicationContext().getSharedPreferences("MQTTConnectionSetup", MODE_PRIVATE)
+                        .edit()
+                        .putBoolean("connStatus", isConnected)
+                        .commit();
+                Toast.makeText(getApplicationContext(), "Connected MQTT successfully", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void connectionLost(Throwable cause) {
-
+                boolean isConnected = mqttAndroidClient.isConnected();
+                //Save connect status
+                getApplicationContext().getSharedPreferences("MQTTConnectionSetup", MODE_PRIVATE)
+                        .edit()
+                        .putBoolean("connStatus", isConnected)
+                        .commit();
+                Toast.makeText(getApplicationContext(), "MQTT connection failed!", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
-                Log.w(TAG, message.toString());
+                Log.w(topic.toString(), message.toString());
             }
 
             @Override
@@ -259,8 +279,21 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
     }
+
+    public MqttApi getMqttApi() {
+        return this.mqttApi;
+    }
+
+//    @Override
+//    public void onClickSwitch(String deviceName, boolean on_off) {
+//        try{
+//            mqttApi.publishToTopic(deviceName, 0, "testAPP");
+//        }catch (NullPointerException ex){
+//
+//        }
+//        Log.d(TAG, "implement method interface");
+//    }
 }
 
 

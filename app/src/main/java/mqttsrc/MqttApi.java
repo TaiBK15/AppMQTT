@@ -1,8 +1,12 @@
 package mqttsrc;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.example.mqttapplication.activity.MainActivity;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
@@ -16,32 +20,30 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.io.UnsupportedEncodingException;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class MqttApi {
 
     final String TAG = "MQTT API";
     final String clientID = "APP MQTT";
+    private Context context;
     private String hostserver, username, password;
     private String publish_topic, subscribe_topic;
     private MqttAndroidClient mqttAndroidClient;
-
-//    final String hostserver = "tcp://m10.cloudmqtt.com:10452";
-//    final String username = "asxdszmm";
-//    final String password = "NJw3kQLh_Mze";
-//    final String publish_topic = "DOWNLINK";
-//    final String subcribe_topic = "UPLINK";
-
+    private boolean isConnected;
 
     public MqttAndroidClient getMqttAndroidClient() {
-        return mqttAndroidClient;
+        return this.mqttAndroidClient;
     }
 
     public MqttApi(Context context, String hostserver, String username, String password) {
+        this.context = context;
         this.hostserver = hostserver;
         this.username = username;
         this.password = password;
-        //Connect to MQTT broker
+
+        //Create new object mqttclient
         mqttAndroidClient = new MqttAndroidClient(context, hostserver, clientID);
-        connect();
     }
 
     public void setCallback(MqttCallbackExtended callback) {
@@ -51,8 +53,9 @@ public class MqttApi {
     public void connect() {
 
         MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
-        mqttConnectOptions.setAutomaticReconnect(true);
-        mqttConnectOptions.setCleanSession(false);
+        mqttConnectOptions.setAutomaticReconnect(false);
+        mqttConnectOptions.setCleanSession(false); //default false
+        mqttConnectOptions.setConnectionTimeout(1); //default 30s
         mqttConnectOptions.setUserName(username);
         mqttConnectOptions.setPassword(password.toCharArray());
         try {
@@ -67,13 +70,32 @@ public class MqttApi {
                     disconnectedBufferOptions.setPersistBuffer(false);
                     disconnectedBufferOptions.setDeleteOldestMessages(false);
                     mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
+
                     Log.d(TAG, "Connected MQTT successfully");
-                    publish(mqttAndroidClient, "TestMQTT", 0, "TestAPPMQTT");
-                    subscribe(mqttAndroidClient, "testAPP", 0);
+
+                    //Subscribe on 8 topics
+                    subscribeToTopic("device_1/data", 0);
+                    subscribeToTopic("device_2/data", 0);
+                    subscribeToTopic("device_3/data", 0);
+                    subscribeToTopic("device_4/data", 0);
+                    subscribeToTopic("device_5/data", 0);
+                    subscribeToTopic("device_6/data", 0);
+                    subscribeToTopic("device_7/data", 0);
+                    subscribeToTopic("device_8/data", 0);
+
                 }
 
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                    Log.d(TAG, "Connected MQTT failed");
+                    Toast.makeText(context, "Connected MQTT failed!", Toast.LENGTH_LONG).show();
+
+                    isConnected = mqttAndroidClient.isConnected();
+                    //Save connect status
+                    context.getSharedPreferences("MQTTConnectionSetup", MODE_PRIVATE)
+                            .edit()
+                            .putBoolean("connStatus", isConnected)
+                            .commit();
                 }
             });
 
@@ -138,9 +160,12 @@ public class MqttApi {
     public void disconnect(@NonNull MqttAndroidClient client)
             throws MqttException {
         IMqttToken mqttToken = client.disconnect();
+        client.unregisterResources();
+        client = null;
         mqttToken.setActionCallback(new IMqttActionListener() {
             @Override
             public void onSuccess(IMqttToken iMqttToken) {
+                Log.d(TAG, "Disconnect successfully");
             }
 
             @Override
