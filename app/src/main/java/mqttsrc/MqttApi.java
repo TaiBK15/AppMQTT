@@ -1,5 +1,6 @@
 package mqttsrc;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
@@ -32,8 +33,14 @@ public class MqttApi {
     private MqttAndroidClient mqttAndroidClient;
     private boolean isConnected;
 
+    private Dialog dialog;
+
     public MqttAndroidClient getMqttAndroidClient() {
         return this.mqttAndroidClient;
+    }
+
+    public void setDialog(Dialog dialog) {
+        this.dialog = dialog;
     }
 
     public MqttApi(Context context, String hostserver, String username, String password) {
@@ -63,15 +70,16 @@ public class MqttApi {
             mqttAndroidClient.connect(mqttConnectOptions, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
-
                     DisconnectedBufferOptions disconnectedBufferOptions = new DisconnectedBufferOptions();
                     disconnectedBufferOptions.setBufferEnabled(true);
                     disconnectedBufferOptions.setBufferSize(100);
                     disconnectedBufferOptions.setPersistBuffer(false);
                     disconnectedBufferOptions.setDeleteOldestMessages(false);
                     mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
-
                     Log.d(TAG, "Connected MQTT successfully");
+
+                    if(dialog != null)
+                        dialog.cancel();
 
                     //Subscribe on 8 topics
                     subscribeToTopic("device_1/data", 0);
@@ -89,6 +97,9 @@ public class MqttApi {
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
                     Log.d(TAG, "Connected MQTT failed");
                     Toast.makeText(context, "Connected MQTT failed!", Toast.LENGTH_LONG).show();
+
+                    if(dialog != null)
+                        dialog.cancel();
 
                     isConnected = mqttAndroidClient.isConnected();
                     //Save connect status
