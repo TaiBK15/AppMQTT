@@ -1,5 +1,7 @@
 package com.example.mqttapplication.fragment;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
@@ -15,6 +17,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.mqttapplication.R;
+import com.example.mqttapplication.activity.MainActivity;
+import com.example.mqttapplication.viewmodel.ConnectStatusViewModel;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -33,34 +37,21 @@ public class FragmentConnectStatus extends Fragment {
         View view = inflater.inflate(R.layout.fragment_connect_status, container, false);
         imgViewConnStatus = view.findViewById(R.id.img_connection_status);
 
-        waitConnect = new Thread() {
+        ConnectStatusViewModel model = ViewModelProviders.of(getActivity()).get(ConnectStatusViewModel.class );
+        model.getConnStatus().observe(getActivity(), new Observer<Boolean>() {
             @Override
-            public void run() {
-                try {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                                //Get connect status from Share Preferences
-                                SharedPreferences mqttConnInfo = getActivity().getSharedPreferences("MQTTConnectionSetup",
-                                        MODE_PRIVATE);
-                                connStatus = mqttConnInfo.getBoolean("connStatus", false);
-                                if (connStatus) {
-                                    //Set icon connected
-                                    imgViewConnStatus.setImageResource(R.drawable.ic_connected);
-                                    imgViewConnStatus.setBackgroundResource(R.drawable.bkg_ic_connected);
-                                } else {
-                                    //Set icon disconnected
-                                    imgViewConnStatus.setImageResource(R.drawable.ic_disconnected);
-                                    imgViewConnStatus.setBackgroundResource(R.drawable.bkg_ic_disconnected);
-                                }
-                            }
-                    });
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+            public void onChanged(@Nullable Boolean aBoolean) {
+                if (aBoolean) {
+                    //Set icon connected
+                    imgViewConnStatus.setImageResource(R.drawable.ic_connected);
+                    imgViewConnStatus.setBackgroundResource(R.drawable.bkg_ic_connected);
+                } else {
+                    //Set icon disconnected
+                    imgViewConnStatus.setImageResource(R.drawable.ic_disconnected);
+                    imgViewConnStatus.setBackgroundResource(R.drawable.bkg_ic_disconnected);
                 }
             }
-        };
-        waitConnect.start();
+        });
         return view;
 
 //

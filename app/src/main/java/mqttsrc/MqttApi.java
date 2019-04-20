@@ -7,7 +7,10 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.mqttapplication.activity.DeviceDetailActivity;
 import com.example.mqttapplication.activity.MainActivity;
+import com.example.mqttapplication.viewmodel.ConnectStatusViewModel;
+import com.example.mqttapplication.viewmodel.DeviceDetailActivityViewModel;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
@@ -31,12 +34,17 @@ public class MqttApi {
     private String hostserver, username, password;
     private String publish_topic, subscribe_topic;
     private MqttAndroidClient mqttAndroidClient;
-    private boolean isConnected;
+    private boolean isConnected, isRunning;
 
     private Dialog dialog;
+    private ConnectStatusViewModel fragConnModel;
 
     public MqttAndroidClient getMqttAndroidClient() {
         return this.mqttAndroidClient;
+    }
+
+    public void setViewModel(ConnectStatusViewModel fragConnModel) {
+        this.fragConnModel = fragConnModel;
     }
 
     public void setDialog(Dialog dialog) {
@@ -56,6 +64,7 @@ public class MqttApi {
     public void setCallback(MqttCallbackExtended callback) {
         mqttAndroidClient.setCallback(callback);
     }
+
 
     public void connect() {
 
@@ -102,11 +111,14 @@ public class MqttApi {
                         dialog.cancel();
 
                     isConnected = mqttAndroidClient.isConnected();
-                    //Save connect status
+                    //Save connect status into share preference
                     context.getSharedPreferences("MQTTConnectionSetup", MODE_PRIVATE)
                             .edit()
                             .putBoolean("connStatus", isConnected)
                             .commit();
+                    //Save connect status into viewmodel
+                    fragConnModel.setConnStatus(isConnected);
+//                    DeviceDetailActivity.getInstance().setConnectToDevice(isConnected);
                 }
             });
 

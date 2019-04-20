@@ -1,6 +1,7 @@
 package com.example.mqttapplication.activity;
 
 import android.app.Dialog;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
@@ -24,6 +25,8 @@ import com.example.mqttapplication.R;
 import com.example.mqttapplication.adapter.ViewPagerAdapter;
 import com.example.mqttapplication.fragment.FragmentConnectStatus;
 import com.example.mqttapplication.fragment.FragmentDeviceList;
+import com.example.mqttapplication.viewmodel.ConnectStatusViewModel;
+import com.example.mqttapplication.viewmodel.DeviceDetailActivityViewModel;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -51,9 +54,17 @@ public class MainActivity extends AppCompatActivity{
     //Dialog connect animation
     private ImageView imgConnAnimation;
     AnimationDrawable wifiAnimation;
-
+    //MQTT Object
     private MqttAndroidClient mqttAndroidClient;
     private MqttApi mqttApi;
+    //Connect status viewmodel
+    private ConnectStatusViewModel fragConnModel;
+    private DeviceDetailActivity deviceDetailActivity;
+    //Flag check activity is running ?
+    private boolean isRunning;
+    //Interface connect listener
+    private ConnectStatusListenerInterface mConnListener;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +73,10 @@ public class MainActivity extends AppCompatActivity{
 
         //Connect to mqtt server in the first time
         restorePreference();
-        startMQTT();
+        boolean valid = (hostname.equals("")) || (port.equals("")) || (username.equals("")) || (password.equals(""));
+        if(!valid) {
+            startMQTT();
+        }
 
         toolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
@@ -83,7 +97,22 @@ public class MainActivity extends AppCompatActivity{
         tablayout.getTabAt(0).setIcon(R.drawable.ic_wifi);
         tablayout.getTabAt(1).setIcon(R.drawable.ic_list);
 
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isRunning = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        isRunning = false;
+    }
+
+    public void setConnectListener(ConnectStatusListenerInterface listener){
+        mConnListener = listener;
     }
 
     @Override
@@ -102,7 +131,6 @@ public class MainActivity extends AppCompatActivity{
         }
 
         return super.onOptionsItemSelected(item);
-
     }
 
     /**
@@ -248,9 +276,13 @@ public class MainActivity extends AppCompatActivity{
             }
         }
 
+        //Create viewmodel object
+        fragConnModel = ViewModelProviders.of(this).get(ConnectStatusViewModel.class);
+
         String hostserver = "tcp://" + hostname + ":" + port;
         mqttApi = new MqttApi(getApplicationContext(), hostserver, username, password);
         mqttApi.setDialog(dialog_animation);
+        mqttApi.setViewModel(fragConnModel);
         mqttApi.connect();
 
         mqttAndroidClient = mqttApi.getMqttAndroidClient();
@@ -259,11 +291,22 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void connectComplete(boolean reconnect, String serverURI) {
                 boolean isConnected = mqttAndroidClient.isConnected();
-                //Save connect status
+                //Save connect status to share preference
                 getApplicationContext().getSharedPreferences("MQTTConnectionSetup", MODE_PRIVATE)
                         .edit()
                         .putBoolean("connStatus", isConnected)
                         .commit();
+                //Save connect status to viewmodels
+                fragConnModel.setConnStatus(isConnected);
+
+                //Set connect status to device detail activity
+//                DeviceDetailActivity.getInstance().setConnectToDevice(isConnected);
+//                if(isRunning != true){
+//                    deviceDetailActivity = new DeviceDetailActivity();
+//                    deviceDetailActivity.setConnectToDevice(isConnected);
+//                    mConnListener.setConnectStatus(isConnected);
+//                }
+
                 Toast.makeText(getApplicationContext(), "Connected MQTT successfully", Toast.LENGTH_LONG).show();
             }
 
@@ -275,6 +318,17 @@ public class MainActivity extends AppCompatActivity{
                         .edit()
                         .putBoolean("connStatus", isConnected)
                         .commit();
+                //Save connect status to viewmodels
+                fragConnModel.setConnStatus(isConnected);
+
+                //Set connect status to device detail activity
+//                DeviceDetailActivity.getInstance().setConnectToDevice(isConnected);
+//                if(isRunning != true){
+//                    deviceDetailActivity = new DeviceDetailActivity();
+//                    deviceDetailActivity.setConnectToDevice(isConnected);
+//                    mConnListener.setConnectStatus(isConnected);
+//                }
+
                 Toast.makeText(getApplicationContext(), "MQTT connection failed!", Toast.LENGTH_LONG).show();
             }
 
@@ -289,7 +343,6 @@ public class MainActivity extends AppCompatActivity{
             }
         });
     }
-
     public MqttApi getMqttApi() {
         return this.mqttApi;
     }
