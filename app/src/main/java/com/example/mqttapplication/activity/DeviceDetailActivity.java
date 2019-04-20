@@ -1,15 +1,13 @@
 package com.example.mqttapplication.activity;
 
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,7 +16,11 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.example.mqttapplication.R;
-import com.example.mqttapplication.viewmodel.DeviceDetailActivityViewModel;
+import com.example.mqttapplication.eventbus.ConnectStatusEvent;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import mqttsrc.MqttApi;
 
@@ -32,21 +34,6 @@ public class DeviceDetailActivity extends AppCompatActivity {
     private TextView tv_proBarHumidity, tv_proBarBrightness, tv_temp;
     private Switch sw_light;
     private MqttApi mqttApi;
-    private DeviceDetailActivityViewModel model;
-
-//    private static DeviceDetailActivity instance;
-
-    //No outer class can create object via this construtor method
-//    private DeviceDetailActivity(){
-//
-//    }
-//
-//    public static DeviceDetailActivity getInstance(){
-//        if(instance == null){
-//            instance = new DeviceDetailActivity();
-//        }
-//        return instance;
-//    }
 
     public DeviceDetailActivity(){
 
@@ -83,7 +70,7 @@ public class DeviceDetailActivity extends AppCompatActivity {
 
         //Create viewmodel object
 //        model = ViewModelProviders.of(this).get(DeviceDetailActivityViewModel.class);
-//        model.getConnStatus().observe(this, new Observer<Boolean>() {
+//        connStatus.observe(this, new Observer<Boolean>() {
 //            @Override
 //            public void onChanged(@Nullable Boolean aBoolean) {
 //                if(aBoolean)
@@ -129,17 +116,6 @@ public class DeviceDetailActivity extends AppCompatActivity {
 
             }
         });
-
-//        MainActivity event = new MainActivity();
-//        event.setConnectListener(new ConnectStatusListenerInterface() {
-//            @Override
-//            public void setConnectStatus(boolean isConnected) {
-//                if(isConnected)
-//                    deviceToolbar.setSubtitle("Connect to " + hostname);
-//                else
-//                    deviceToolbar.setSubtitle("Not found broker MQTT");
-//            }
-//        });
 
     }
 
@@ -198,25 +174,32 @@ public class DeviceDetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
 
     }
-//
-//    public void setConnectToDevice(Boolean isConnected){
-//        model = ViewModelProviders.of(this).get(DeviceDetailActivityViewModel.class);
-//        model.setConnStatus(isConnected);
-//    }
 
-//    @Override
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onEvent(ConnectStatusEvent connectStatusEvent){
+        if(connectStatusEvent.isConnected())
+            deviceToolbar.setSubtitle("Connect to " + hostname);
+        else
+            deviceToolbar.setSubtitle("Not found broker MQTT");
+    }
+
+    //    @Override
 //    public void setConnectStatus(boolean isConnected) {
-//        if(isConnected)
-//            deviceToolbar.setSubtitle("Connect to " + hostname);
-//        else
-//            deviceToolbar.setSubtitle("Not found broker MQTT");
+//        deviceToolbar = findViewById(R.id.device_detail_toolbar);
+//        setSupportActionBar(deviceToolbar);
+//        deviceToolbar.setSubtitle("Not found broker MQTT");
 //    }
 
-//    public final void setOnClick(OnClickSwitchListener onClick){
-//        this.onClick = onClick;
-//    }
-//
-//    interface OnClickSwitchListener{
-//        void onClickSwitch(String deviceName, boolean on_off);
-//    }
 }

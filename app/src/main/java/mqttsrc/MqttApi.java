@@ -10,7 +10,6 @@ import android.widget.Toast;
 import com.example.mqttapplication.activity.DeviceDetailActivity;
 import com.example.mqttapplication.activity.MainActivity;
 import com.example.mqttapplication.viewmodel.ConnectStatusViewModel;
-import com.example.mqttapplication.viewmodel.DeviceDetailActivityViewModel;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
