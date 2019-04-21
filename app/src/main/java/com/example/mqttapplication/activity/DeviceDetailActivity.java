@@ -11,12 +11,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.example.mqttapplication.R;
 import com.example.mqttapplication.eventbus.ConnectStatusEvent;
+import com.example.mqttapplication.eventbus.DataReceiveEvent;
+import com.example.mqttapplication.eventbus.SwitchEvent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -30,10 +33,12 @@ public class DeviceDetailActivity extends AppCompatActivity {
     private String title, hostname;
     private int background;
     private boolean connStatus;
+    private LinearLayout ln_device_detail;
     private ProgressBar proBarHumidity, proBarBrightness, proBarTemperature;
     private TextView tv_proBarHumidity, tv_proBarBrightness, tv_temp;
     private Switch sw_light;
     private MqttApi mqttApi;
+    private int deviceID, temp, bright, humidity;
 
     public DeviceDetailActivity(){
 
@@ -60,25 +65,20 @@ public class DeviceDetailActivity extends AppCompatActivity {
 
         //Set data for toolbar
         deviceToolbar = findViewById(R.id.device_detail_toolbar);
+        ln_device_detail = findViewById(R.id.ln_device_detail);
         setSupportActionBar(deviceToolbar);
         getSupportActionBar().setTitle(title);
-        //Set initially subtitle
-        if(connStatus)
-            deviceToolbar.setSubtitle("Connect to " + hostname);
-        else
-            deviceToolbar.setSubtitle("Not found broker MQTT");
 
-        //Create viewmodel object
-//        model = ViewModelProviders.of(this).get(DeviceDetailActivityViewModel.class);
-//        connStatus.observe(this, new Observer<Boolean>() {
-//            @Override
-//            public void onChanged(@Nullable Boolean aBoolean) {
-//                if(aBoolean)
-//                    deviceToolbar.setSubtitle("Connect to " + hostname);
-//                else
-//                    deviceToolbar.setSubtitle("Not found broker MQTT");
-//            }
-//        });
+        //Set initially subtitle
+        if(connStatus){
+            deviceToolbar.setSubtitle("Connect to " + hostname);
+            ln_device_detail.setVisibility(LinearLayout.VISIBLE);
+        }
+
+        else{
+            deviceToolbar.setSubtitle("Not found broker MQTT");
+            ln_device_detail.setVisibility(LinearLayout.INVISIBLE);
+        }
 
         //Call function to set background for Toolbar
         setBackgroundToolbar(background);
@@ -107,13 +107,7 @@ public class DeviceDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 boolean state = sw_light.isChecked();
-//                mqttApi.publishToTopic(title, 0, "AppMQTT");
-//                if(onClick == null)
-//                    Log.d(TAG, "interface null");
-//                else
-//                    onClick.onClickSwitch(title, state);
-
-
+                EventBus.getDefault().post(new SwitchEvent(state));
             }
         });
 
@@ -187,19 +181,45 @@ public class DeviceDetailActivity extends AppCompatActivity {
         EventBus.getDefault().unregister(this);
     }
 
-    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    /**
+     * Subscribe connect event from main activity
+     * @param connectStatusEvent
+     */
+    @Subscribe(sticky = false, threadMode = ThreadMode.MAIN)
     public void onEvent(ConnectStatusEvent connectStatusEvent){
-        if(connectStatusEvent.isConnected())
+
+        if(connectStatusEvent.isConnected()){
             deviceToolbar.setSubtitle("Connect to " + hostname);
-        else
+            ln_device_detail.setVisibility(LinearLayout.VISIBLE);
+        }
+        else{
             deviceToolbar.setSubtitle("Not found broker MQTT");
+            ln_device_detail.setVisibility(LinearLayout.INVISIBLE);
+        }
     }
 
-    //    @Override
-//    public void setConnectStatus(boolean isConnected) {
-//        deviceToolbar = findViewById(R.id.device_detail_toolbar);
-//        setSupportActionBar(deviceToolbar);
-//        deviceToolbar.setSubtitle("Not found broker MQTT");
-//    }
+    /**
+     * Subsribe data receive event from main activity
+     * @param dataReceiveEvent
+     */
+    @Subscribe(sticky = false, threadMode = ThreadMode.MAIN)
+    public void onEvent(DataReceiveEvent dataReceiveEvent){
+        deviceID = dataReceiveEvent.getDeviceID();
+        temp = dataReceiveEvent.getTemp();
+        bright = dataReceiveEvent.getBright();
+        humidity = dataReceiveEvent.getHumidity();
 
+        //Set data for sensor Temperature
+        proBarTemperature.setProgress(temp);
+        tv_temp.setText(temp + "\u2103");
+
+        //Set data for sensor Brightness
+        proBarBrightness.setProgress(bright);
+        tv_proBarBrightness.setText("" + bright + "%");
+
+        //Set data for sensor Humidity
+        proBarHumidity.setProgress(humidity);
+        tv_proBarHumidity.setText("" + humidity + "%");
+
+    }
 }
