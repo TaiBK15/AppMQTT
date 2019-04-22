@@ -2,6 +2,7 @@ package com.example.mqttapplication.activity;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -20,10 +21,14 @@ import com.example.mqttapplication.R;
 import com.example.mqttapplication.eventbus.ConnectStatusEvent;
 import com.example.mqttapplication.eventbus.DataReceiveEvent;
 import com.example.mqttapplication.eventbus.SwitchEvent;
+import com.example.mqttapplication.roomdatabase.EntityDevice_1;
+import com.example.mqttapplication.viewmodel.DeviceDetailViewModel;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.List;
 
 import mqttsrc.MqttApi;
 
@@ -39,6 +44,7 @@ public class DeviceDetailActivity extends AppCompatActivity {
     private Switch sw_light;
     private MqttApi mqttApi;
     private int deviceID, temp, bright, humidity;
+    private DeviceDetailViewModel deviceDetailViewModel;
 
     public DeviceDetailActivity(){
 
@@ -83,23 +89,31 @@ public class DeviceDetailActivity extends AppCompatActivity {
         //Call function to set background for Toolbar
         setBackgroundToolbar(background);
 
-        //Set data for sensor Temperature
         proBarTemperature = findViewById(R.id.progressBarTemperature);
         tv_temp = findViewById(R.id.tv_temp);
-        proBarTemperature.setProgress(100);
-        tv_temp.setText(100 + "\u2103");
-
-        //Set data for sensor Brightness
         proBarBrightness = findViewById(R.id.progressBarBrightness);
         tv_proBarBrightness = findViewById(R.id.tv_progressBarBrightness);
-        proBarBrightness.setProgress(70);
-        tv_proBarBrightness.setText("" + 70 + "%");
-
-        //Set data for sensor Humidity
         proBarHumidity = findViewById(R.id.progressBarHumidity);
         tv_proBarHumidity = findViewById(R.id.tv_progressBarHumidity);
-        proBarHumidity.setProgress(50);
-        tv_proBarHumidity.setText("" + 50 + "%");
+
+        deviceDetailViewModel = ViewModelProviders.of(this).get(DeviceDetailViewModel.class);
+        deviceDetailViewModel.getLatestData().observe(this, new Observer<List<EntityDevice_1>>() {
+            @Override
+            public void onChanged(@Nullable List<EntityDevice_1> entityDevice_1) {
+                    //Set data for sensor Temperature
+                    proBarTemperature.setProgress(entityDevice_1.get(0).getTemp());
+                    tv_temp.setText(entityDevice_1.get(0).getTemp() + "\u2103");
+
+                    //Set data for sensor Brightness
+                    proBarBrightness.setProgress(entityDevice_1.get(0).getBright());
+                    tv_proBarBrightness.setText("" + entityDevice_1.get(0).getBright() + "%");
+
+                    //Set data for sensor Humidity
+                    proBarHumidity.setProgress(entityDevice_1.get(0).getHumidity());
+                    tv_proBarHumidity.setText("" + entityDevice_1.get(0).getHumidity() + "%");
+            }
+
+        });
 
         //Set on click switch
         sw_light = findViewById(R.id.sw_light);
@@ -208,18 +222,20 @@ public class DeviceDetailActivity extends AppCompatActivity {
         temp = dataReceiveEvent.getTemp();
         bright = dataReceiveEvent.getBright();
         humidity = dataReceiveEvent.getHumidity();
+//
+//        //Set data for sensor Temperature
+//        proBarTemperature.setProgress(temp);
+//        tv_temp.setText(temp + "\u2103");
+//
+//        //Set data for sensor Brightness
+//        proBarBrightness.setProgress(bright);
+//        tv_proBarBrightness.setText("" + bright + "%");
+//
+//        //Set data for sensor Humidity
+//        proBarHumidity.setProgress(humidity);
+//        tv_proBarHumidity.setText("" + humidity + "%");
 
-        //Set data for sensor Temperature
-        proBarTemperature.setProgress(temp);
-        tv_temp.setText(temp + "\u2103");
 
-        //Set data for sensor Brightness
-        proBarBrightness.setProgress(bright);
-        tv_proBarBrightness.setText("" + bright + "%");
-
-        //Set data for sensor Humidity
-        proBarHumidity.setProgress(humidity);
-        tv_proBarHumidity.setText("" + humidity + "%");
-
+        deviceDetailViewModel.insert(new EntityDevice_1(temp, bright, humidity));
     }
 }
