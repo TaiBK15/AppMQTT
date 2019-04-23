@@ -22,9 +22,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activity.DeviceDetailActivity">
+        <activity android:name=".activity.DeviceDetailActivity"></activity>
+        <activity android:name=".activity.DeviceLogActivity"></activity>
 
-        </activity>
         <service android:name="org.eclipse.paho.android.service.MqttService" />
     </application>
 

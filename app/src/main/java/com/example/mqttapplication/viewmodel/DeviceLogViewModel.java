@@ -9,11 +9,10 @@ import com.example.mqttapplication.roomdatabase.DeviceEntity;
 
 import java.util.List;
 
-public class DeviceDetailViewModel extends AndroidViewModel {
-
+public class DeviceLogViewModel extends AndroidViewModel {
     private DeviceRepository repo;
 
-    public DeviceDetailViewModel(Application application){
+    public DeviceLogViewModel(Application application){
         super(application);
         repo = new DeviceRepository(application);
     }

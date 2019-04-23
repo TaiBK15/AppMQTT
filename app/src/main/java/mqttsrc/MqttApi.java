@@ -2,19 +2,15 @@ package mqttsrc;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.mqttapplication.activity.DeviceDetailActivity;
-import com.example.mqttapplication.activity.MainActivity;
-import com.example.mqttapplication.viewmodel.ConnectStatusViewModel;
+import com.example.mqttapplication.viewmodel.MainActivityViewModel;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -36,13 +32,13 @@ public class MqttApi {
     private boolean isConnected, isRunning;
 
     private Dialog dialog;
-    private ConnectStatusViewModel fragConnModel;
+    private MainActivityViewModel fragConnModel;
 
     public MqttAndroidClient getMqttAndroidClient() {
         return this.mqttAndroidClient;
     }
 
-    public void setViewModel(ConnectStatusViewModel fragConnModel) {
+    public void setViewModel(MainActivityViewModel fragConnModel) {
         this.fragConnModel = fragConnModel;
     }
 

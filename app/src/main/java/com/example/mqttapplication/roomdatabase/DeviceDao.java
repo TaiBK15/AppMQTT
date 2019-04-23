@@ -20,8 +20,8 @@ public interface DeviceDao {
     @Delete
     void delete(DeviceEntity device_1);
 
-    @Query("DELETE FROM MQTT_DEVICE")
-    void deleteAll();
+    @Query("DELETE FROM MQTT_DEVICE WHERE deviceID = :deviceID")
+    void deleteAll(int deviceID);
 
     @Query("SELECT * FROM MQTT_DEVICE WHERE deviceID = :deviceID ORDER BY id DESC LIMIT 1")
     LiveData<DeviceEntity> getLatestData(int deviceID);

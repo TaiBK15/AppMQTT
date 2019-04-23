@@ -2,25 +2,17 @@ package com.example.mqttapplication.fragment;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.SharedPreferences;
-import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.example.mqttapplication.R;
-import com.example.mqttapplication.activity.MainActivity;
-import com.example.mqttapplication.viewmodel.ConnectStatusViewModel;
-
-import static android.content.Context.MODE_PRIVATE;
+import com.example.mqttapplication.viewmodel.MainActivityViewModel;
 
 public class FragmentConnectStatus extends Fragment {
 
@@ -37,7 +29,7 @@ public class FragmentConnectStatus extends Fragment {
         View view = inflater.inflate(R.layout.fragment_connect_status, container, false);
         imgViewConnStatus = view.findViewById(R.id.img_connection_status);
 
-        ConnectStatusViewModel model = ViewModelProviders.of(getActivity()).get(ConnectStatusViewModel.class );
+        MainActivityViewModel model = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class );
         model.getConnStatus().observe(getActivity(), new Observer<Boolean>() {
             @Override
             public void onChanged(@Nullable Boolean aBoolean) {

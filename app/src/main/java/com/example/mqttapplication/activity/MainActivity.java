@@ -27,7 +27,7 @@ import com.example.mqttapplication.fragment.FragmentConnectStatus;
 import com.example.mqttapplication.fragment.FragmentDeviceList;
 import com.example.mqttapplication.repository.DeviceRepository;
 import com.example.mqttapplication.roomdatabase.DeviceEntity;
-import com.example.mqttapplication.viewmodel.ConnectStatusViewModel;
+import com.example.mqttapplication.viewmodel.MainActivityViewModel;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     private MqttAndroidClient mqttAndroidClient;
     private MqttApi mqttApi;
     //Connect status viewmodel
-    private ConnectStatusViewModel fragConnModel;
+    private MainActivityViewModel fragConnModel;
     //Flag check activity is running ?
     private boolean isRunning;
     //JSON components
@@ -270,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //Create viewmodel object
-        fragConnModel = ViewModelProviders.of(this).get(ConnectStatusViewModel.class);
+        fragConnModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
         String hostserver = "tcp://" + hostname + ":" + port;
         mqttApi = new MqttApi(getApplicationContext(), hostserver, username, password);

@@ -22,8 +22,8 @@ public class DeviceRepository {
         new InsertAsyncTask(deviceDao).execute(deviceEntity);
     }
 
-    public void deleteAll(){
-        new DeleteAsyncTask(deviceDao).execute();
+    public void deleteAll(int deviceID){
+        new DeleteAsyncTask(deviceDao).execute(deviceID);
     }
 
     public LiveData<DeviceEntity> getLatestData(int deviceID) {
@@ -81,7 +81,7 @@ public class DeviceRepository {
     /**
      * Class delete all data in database
      */
-    private static class DeleteAsyncTask extends AsyncTask<Void, Void, Void>{
+    private static class DeleteAsyncTask extends AsyncTask<Integer, Void, Void>{
 
         private DeviceDao asyncTaskDao;
 
@@ -90,8 +90,8 @@ public class DeviceRepository {
         }
 
         @Override
-        protected Void doInBackground(Void... voids) {
-            asyncTaskDao.deleteAll();
+        protected Void doInBackground(Integer... integers) {
+            asyncTaskDao.deleteAll(integers[0]);
             return null;
         }
     }
