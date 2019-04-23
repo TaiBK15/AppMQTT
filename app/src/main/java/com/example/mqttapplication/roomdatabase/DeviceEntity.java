@@ -4,13 +4,16 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
-@Entity(tableName = "device_1")
-public class EntityDevice_1 {
+@Entity(tableName = "MQTT_DEVICE")
+public class DeviceEntity {
     @PrimaryKey(autoGenerate = true)
     private int id;
 
     @ColumnInfo(name = "time")
     private String time;
+
+    @ColumnInfo(name = "deviceID")
+    private int deviceID;
 
     @ColumnInfo(name = "temp")
     private int temp;
@@ -21,7 +24,8 @@ public class EntityDevice_1 {
     @ColumnInfo(name = "humidity")
     private int humidity;
 
-    public EntityDevice_1(int temp, int bright, int humidity) {
+    public DeviceEntity(int deviceID, int temp, int bright, int humidity) {
+        this.deviceID = deviceID;
         this.temp = temp;
         this.bright = bright;
         this.humidity = humidity;
@@ -33,6 +37,10 @@ public class EntityDevice_1 {
 
     public String getTime() {
         return time;
+    }
+
+    public int getDeviceID() {
+        return deviceID;
     }
 
     public int getTemp() {

@@ -4,35 +4,34 @@ import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.os.AsyncTask;
 
-import com.example.mqttapplication.roomdatabase.DaoDevice_1;
-import com.example.mqttapplication.roomdatabase.DatabaseDevice_1;
-import com.example.mqttapplication.roomdatabase.EntityDevice_1;
+import com.example.mqttapplication.roomdatabase.DeviceDao;
+import com.example.mqttapplication.roomdatabase.DeviceDatabase;
+import com.example.mqttapplication.roomdatabase.DeviceEntity;
 
 import java.util.List;
 
 public class DeviceRepository {
-    private LiveData<List<EntityDevice_1>> sensorData ;
-    private DaoDevice_1 daoDevice1;
+    private DeviceDao deviceDao;
 
     public DeviceRepository(Application application){
-        DatabaseDevice_1 database = DatabaseDevice_1.getInstance(application);
-        daoDevice1 = database.daoDevice1();
+        DeviceDatabase database = DeviceDatabase.getInstance(application);
+        deviceDao = database.deviceDao();
     }
 
-    public void insert(EntityDevice_1 device_1){
-        new InsertAsyncTask(daoDevice1).execute(device_1);
+    public void insert(DeviceEntity deviceEntity){
+        new InsertAsyncTask(deviceDao).execute(deviceEntity);
     }
 
     public void deleteAll(){
-        new DeleteAsyncTask(daoDevice1).execute();
+        new DeleteAsyncTask(deviceDao).execute();
     }
 
-    public LiveData<List<EntityDevice_1>> getLatestData() {
-        return daoDevice1.getLatestData();
+    public LiveData<DeviceEntity> getLatestData(int deviceID) {
+        return deviceDao.getLatestData(deviceID);
     }
 
-    public LiveData<List<EntityDevice_1>> getAllData(){
-        return daoDevice1.getAllData();
+    public LiveData<List<DeviceEntity>> getAllData(int deviceID){
+        return deviceDao.getAllData(deviceID);
     }
     /**
      ***************************************************************
@@ -43,39 +42,38 @@ public class DeviceRepository {
      *****************************************************************
      */
 
-    /**
-     * Class get latest data from database
-     */
-    private static class GetLatestAsyncTask extends AsyncTask<Void, Void, LiveData<List<EntityDevice_1>>> {
-
-        private DaoDevice_1 asyncTaskDao;
-
-        GetLatestAsyncTask(DaoDevice_1 dao){
-            asyncTaskDao = dao;
-        }
-
-
-        @Override
-        protected LiveData<List<EntityDevice_1>> doInBackground(Void... voids) {
-            return asyncTaskDao.getLatestData();
-        }
-    }
+//    /**
+//     * Class get latest data from database
+//     */
+//    private static class GetLatestAsyncTask extends AsyncTask<Integer, Void, LiveData<DeviceEntity>> {
+//
+//        private DeviceDao asyncTaskDao;
+//
+//        GetLatestAsyncTask(DeviceDao dao){
+//            asyncTaskDao = dao;
+//        }
+//
+//        @Override
+//        protected LiveData<DeviceEntity> doInBackground(Integer... ints) {
+//            return asyncTaskDao.getLatestData(ints[0]);
+//        }
+//    }
 
     /**
      * Class insert data into database
      */
-    private static class InsertAsyncTask extends AsyncTask<EntityDevice_1, Void, Void>{
+    private static class InsertAsyncTask extends AsyncTask<DeviceEntity, Void, Void>{
 
-        private  DaoDevice_1 asyncTaskDao;
+        private DeviceDao asyncTaskDao;
 
-        InsertAsyncTask(DaoDevice_1 dao){
+        InsertAsyncTask(DeviceDao dao){
             asyncTaskDao = dao;
         }
 
 
         @Override
-        protected Void doInBackground(EntityDevice_1... entityDevice_1) {
-            asyncTaskDao.insert(entityDevice_1[0]);
+        protected Void doInBackground(DeviceEntity... device_Entity) {
+            asyncTaskDao.insert(device_Entity[0]);
             return null;
         }
     }
@@ -85,9 +83,9 @@ public class DeviceRepository {
      */
     private static class DeleteAsyncTask extends AsyncTask<Void, Void, Void>{
 
-        private  DaoDevice_1 asyncTaskDao;
+        private DeviceDao asyncTaskDao;
 
-        DeleteAsyncTask(DaoDevice_1 dao){
+        DeleteAsyncTask(DeviceDao dao){
             asyncTaskDao = dao;
         }
 

@@ -97,6 +97,7 @@
                         android:id="@+id/tv_temp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:text="0℃"
                         android:layout_marginTop="@dimen/margin_top_edit_text"
                         android:textSize="@dimen/size_number_element"  />
 
@@ -118,6 +119,7 @@
                     android:layout_marginBottom="@dimen/padding_image_margin_top_device"
                     android:layout_gravity="center"
                     android:max="100"
+                    android:progress="0"
                     android:progressDrawable="@drawable/vertical_progress_bar_temperature" />
 
             </LinearLayout>
@@ -179,6 +181,7 @@
                             android:indeterminate="false"
                             android:max="100"
                             android:rotation="-90"
+                            android:progress="0"
                             android:progressDrawable="@drawable/circular_progress_bar_brightness" />
 
                         <TextView
@@ -186,7 +189,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
-                            android:text="85%"
+                            android:text="0%"
                             android:textSize="@dimen/size_number_element"
                             android:background="@color/colorTransparent"/>
 
@@ -241,6 +244,7 @@
                             android:indeterminate="false"
                             android:max="100"
                             android:rotation="-90"
+                            android:progress="0"
                             android:progressDrawable="@drawable/circular_progress_bar_humidity" />
 
                         <TextView
@@ -248,7 +252,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
-                            android:text="85%"
+                            android:text="0%"
                             android:textSize="@dimen/size_number_element"
                             android:background="@color/colorTransparent"/>
 

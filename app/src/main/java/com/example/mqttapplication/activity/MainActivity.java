@@ -10,7 +10,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,9 +23,10 @@ import android.widget.Toast;
 import com.example.mqttapplication.R;
 import com.example.mqttapplication.adapter.ViewPagerAdapter;
 import com.example.mqttapplication.eventbus.ConnectStatusEvent;
-import com.example.mqttapplication.eventbus.DataReceiveEvent;
 import com.example.mqttapplication.fragment.FragmentConnectStatus;
 import com.example.mqttapplication.fragment.FragmentDeviceList;
+import com.example.mqttapplication.repository.DeviceRepository;
+import com.example.mqttapplication.roomdatabase.DeviceEntity;
 import com.example.mqttapplication.viewmodel.ConnectStatusViewModel;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
@@ -323,7 +323,8 @@ public class MainActivity extends AppCompatActivity {
             public void messageArrived(String topic, MqttMessage message) throws Exception {
 //                Log.w(topic.toString(), message.toString());
                 parseJSONString(message.toString());
-                EventBus.getDefault().post(new DataReceiveEvent(deviceID, temp, bright, humidity));
+                savingDatabase();
+//                EventBus.getDefault().post(new DataReceiveEvent(deviceID, temp, bright, humidity));
             }
 
             @Override
@@ -344,6 +345,15 @@ public class MainActivity extends AppCompatActivity {
         temp = param.getInt("sensor_temp");
         bright = param.getInt("sensor_bright");
         humidity = param.getInt("sensor_humidity");
+    }
+
+    /**
+     * Save into database via repository
+     * @return
+     */
+    private void savingDatabase(){
+        DeviceRepository repo = new DeviceRepository(getApplication());
+        repo.insert(new DeviceEntity(deviceID, temp, bright, humidity));
     }
 
     public MqttApi getMqttApi() {
