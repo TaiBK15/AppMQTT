@@ -24,7 +24,8 @@ public class DeviceEntity {
     @ColumnInfo(name = "humidity")
     private int humidity;
 
-    public DeviceEntity(int deviceID, int temp, int bright, int humidity) {
+    public DeviceEntity(String time, int deviceID, int temp, int bright, int humidity) {
+        this.time = time;
         this.deviceID = deviceID;
         this.temp = temp;
         this.bright = bright;

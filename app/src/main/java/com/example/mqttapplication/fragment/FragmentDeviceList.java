@@ -162,10 +162,10 @@ public class FragmentDeviceList extends Fragment implements View.OnClickListener
                             startActivity(intent);
                         return true;
                     case R.id.popup_reset:
+                        Toast.makeText(getContext(), "Reset data in device " + deviceId, Toast.LENGTH_LONG).show();
                         MainActivityViewModel model = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class );
                         model.deleteAll(deviceId);
                 }
-                Toast.makeText(getContext(), "" + item.getTitle(), Toast.LENGTH_LONG).show();
                 return true;
             }
         });

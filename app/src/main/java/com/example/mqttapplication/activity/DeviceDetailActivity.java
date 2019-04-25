@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,21 +26,23 @@ import com.example.mqttapplication.viewmodel.DeviceDetailViewModel;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import mqttsrc.MqttApi;
 
 public class DeviceDetailActivity extends AppCompatActivity {
     private final String TAG = this.getClass().getSimpleName();
     private Toolbar deviceToolbar;
-    private String title, hostname;
-    private boolean connStatus;
+    private String title, hostname, topic;
+    private boolean connStatus, swStatus;
     private LinearLayout ln_device_detail;
     private ProgressBar proBarHumidity, proBarBrightness, proBarTemperature;
     private TextView tv_proBarHumidity, tv_proBarBrightness, tv_temp;
     private Switch sw_light;
-    private MqttApi mqttApi;
     private int deviceID, temp, bright, humidity;
     private DeviceDetailViewModel deviceDetailViewModel;
+    private MqttApi mqttApi;
 
     public DeviceDetailActivity(){
 
@@ -81,6 +84,11 @@ public class DeviceDetailActivity extends AppCompatActivity {
             ln_device_detail.setVisibility(LinearLayout.INVISIBLE);
         }
 
+        sw_light = findViewById(R.id.sw_light);
+        SharedPreferences switchState = getSharedPreferences("SwitchState", MODE_PRIVATE);
+        swStatus = switchState.getBoolean("sw_device_" + deviceID, false);
+        sw_light.setChecked(swStatus);
+
         //Call function to set background for Toolbar
         setBackgroundToolbar(deviceID);
 
@@ -113,12 +121,27 @@ public class DeviceDetailActivity extends AppCompatActivity {
         });
 
         //Set on click switch
-        sw_light = findViewById(R.id.sw_light);
         sw_light.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean state = sw_light.isChecked();
-                EventBus.getDefault().post(new SwitchEvent(state));
+                swStatus = sw_light.isChecked();
+                SharedPreferences switchState = getSharedPreferences("SwitchState", MODE_PRIVATE);
+                SharedPreferences.Editor saveState = switchState.edit();
+                saveState.putBoolean("sw_device_" + deviceID, swStatus);
+                saveState.commit();
+
+                mqttApi = MainActivity.getMqttApi();
+                try{
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("topic", "device_" + deviceID + "\\/req");
+                    jsonObject.put("deviceID", deviceID);
+                    jsonObject.put("switch", swStatus);
+                    mqttApi.publishToTopic(jsonObject.toString().replace("\\",""), 0, "device_" + deviceID + "/req");
+                    Log.d(TAG, jsonObject.toString());
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
+
             }
         });
 

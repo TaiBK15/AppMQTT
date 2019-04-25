@@ -28,8 +28,9 @@ public class MqttApi {
     private Context context;
     private String hostserver, username, password;
     private String publish_topic, subscribe_topic;
-    private MqttAndroidClient mqttAndroidClient;
     private boolean isConnected, isRunning;
+
+    private MqttAndroidClient mqttAndroidClient;
 
     private Dialog dialog;
     private MainActivityViewModel fragConnModel;

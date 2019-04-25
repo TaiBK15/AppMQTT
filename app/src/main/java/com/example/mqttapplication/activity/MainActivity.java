@@ -10,6 +10,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,6 +39,10 @@ import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 import mqttsrc.MqttApi;
 
 public class MainActivity extends AppCompatActivity {
@@ -60,14 +65,16 @@ public class MainActivity extends AppCompatActivity {
     AnimationDrawable wifiAnimation;
     //MQTT Object
     private MqttAndroidClient mqttAndroidClient;
-    private MqttApi mqttApi;
+    private static MqttApi mqttApi;
     //Connect status viewmodel
-    private MainActivityViewModel fragConnModel;
+    private MainActivityViewModel model;
     //Flag check activity is running ?
     private boolean isRunning;
     //JSON components
     private int deviceID, temp, bright, humidity;
-
+    //Calendar
+    private Calendar calendar;
+    private String currentTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -270,12 +277,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //Create viewmodel object
-        fragConnModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
+        model = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
         String hostserver = "tcp://" + hostname + ":" + port;
         mqttApi = new MqttApi(getApplicationContext(), hostserver, username, password);
         mqttApi.setDialog(dialog_animation);
-        mqttApi.setViewModel(fragConnModel);
+        mqttApi.setViewModel(model);
         mqttApi.connect();
 
         mqttAndroidClient = mqttApi.getMqttAndroidClient();
@@ -290,7 +297,7 @@ public class MainActivity extends AppCompatActivity {
                         .putBoolean("connStatus", isConnected)
                         .commit();
                 //Save connect status to viewmodels
-                fragConnModel.setConnStatus(isConnected);
+                model.setConnStatus(isConnected);
 
                 //Publish event
                 if (isRunning != true) {
@@ -309,7 +316,7 @@ public class MainActivity extends AppCompatActivity {
                         .putBoolean("connStatus", isConnected)
                         .commit();
                 //Save connect status to viewmodels
-                fragConnModel.setConnStatus(isConnected);
+                model.setConnStatus(isConnected);
 
                 //Publish event
                 if (isRunning != true) {
@@ -322,9 +329,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
 //                Log.w(topic.toString(), message.toString());
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                currentTime = df.format(calendar.getInstance().getTime());
+                Log.d(TAG, currentTime);
                 parseJSONString(message.toString());
                 savingDatabase();
-//                EventBus.getDefault().post(new DataReceiveEvent(deviceID, temp, bright, humidity));
             }
 
             @Override
@@ -352,12 +361,12 @@ public class MainActivity extends AppCompatActivity {
      * @return
      */
     private void savingDatabase(){
-        DeviceRepository repo = new DeviceRepository(getApplication());
-        repo.insert(new DeviceEntity(deviceID, temp, bright, humidity));
+        model.insert(new DeviceEntity(currentTime, deviceID, temp, bright, humidity));
     }
 
-    public MqttApi getMqttApi() {
-        return this.mqttApi;
+    //Get previously created object
+    public static MqttApi getMqttApi() {
+        return mqttApi;
     }
 }
 
