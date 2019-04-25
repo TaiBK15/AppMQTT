@@ -60,7 +60,4 @@ public class DeviceEntity {
         this.id = id;
     }
 
-    public void setTime(String time) {
-        this.time = time;
-    }
 }

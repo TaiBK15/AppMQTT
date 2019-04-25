@@ -19,6 +19,45 @@
         app:titleTextAppearance="@style/Device.Toolbar.TitleText"
         android:theme="@style/ThemeOverlay.AppCompat.Dark" />
 
+    <!--***************Title*****************-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="@dimen/margin_bottom_toolbar"
+            android:weightSum="3">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="@dimen/height_title"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:textSize="@dimen/size_text_title_dialog"
+                android:textStyle="bold"
+                android:textColor="@color/textColorPrimary"
+                android:background="@color/colorPrimaryDark"
+                android:paddingLeft="@dimen/padding_left_edit_text"
+                android:text="Time"/>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="@dimen/height_title"
+                android:background="@color/colorThird"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="@dimen/height_title"
+                android:layout_weight="2"
+                android:gravity="center_vertical"
+                android:textSize="@dimen/size_text_title_dialog"
+                android:textColor="@color/textColorPrimary"
+                android:textStyle="bold"
+                android:background="@color/colorPrimaryDark"
+                android:paddingLeft="@dimen/padding_left_edit_text"
+                android:text="Message"/>
+
+        </LinearLayout>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_device_log"
         android:layout_width="match_parent"

@@ -1,11 +1,14 @@
 package com.example.mqttapplication.activity;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,7 +16,11 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.mqttapplication.R;
+import com.example.mqttapplication.adapter.DeviceLogAdapter;
+import com.example.mqttapplication.roomdatabase.DeviceEntity;
 import com.example.mqttapplication.viewmodel.DeviceLogViewModel;
+
+import java.util.List;
 
 public class DeviceLogActivity extends AppCompatActivity {
     private final String TAG = this.getClass().getSimpleName();
@@ -21,6 +28,7 @@ public class DeviceLogActivity extends AppCompatActivity {
     private String title, hostname;
     private boolean connStatus;
     private int deviceID;
+    private DeviceLogViewModel model;
 
     public DeviceLogActivity(){
 
@@ -57,6 +65,19 @@ public class DeviceLogActivity extends AppCompatActivity {
 
         //Call function to set background for Toolbar
         setBackgroundToolbar(deviceID);
+
+        RecyclerView recyclerView = findViewById(R.id.rv_device_log);
+        final DeviceLogAdapter adapter = new DeviceLogAdapter(this);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+
+        model = ViewModelProviders.of(this).get(DeviceLogViewModel.class);
+        model.getAllData(deviceID).observe(this, new Observer<List<DeviceEntity>>() {
+            @Override
+            public void onChanged(@Nullable List<DeviceEntity> deviceEntities) {
+                adapter.setData(deviceEntities);
+            }
+        });
     }
 
     /**

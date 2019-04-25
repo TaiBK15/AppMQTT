@@ -19,7 +19,6 @@ import android.widget.TextView;
 
 import com.example.mqttapplication.R;
 import com.example.mqttapplication.eventbus.ConnectStatusEvent;
-import com.example.mqttapplication.eventbus.SwitchEvent;
 import com.example.mqttapplication.roomdatabase.DeviceEntity;
 import com.example.mqttapplication.viewmodel.DeviceDetailViewModel;
 
@@ -104,6 +103,7 @@ public class DeviceDetailActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable DeviceEntity device_Entity) {
                 if(device_Entity != null){
+                    Log.d(TAG, device_Entity.getTime());
                     //Set data for sensor Temperature
                     proBarTemperature.setProgress(device_Entity.getTemp());
                     tv_temp.setText(device_Entity.getTemp() + "\u2103");

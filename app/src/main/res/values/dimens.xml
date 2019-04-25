@@ -29,9 +29,8 @@
     <dimen name="padding_image_element">8dp</dimen>
     <dimen name="margin_left_image_element">8dp</dimen>
     <dimen name="elevation_element">5dp</dimen>
-
-
-
+    <!--*************** Item device log ************** -->
+    <dimen name="height_size_log">40dp</dimen>
 
 
                     <!-- Text size -->
@@ -43,6 +42,8 @@
     <!--*************** Device Detail Element ************** -->
     <dimen name="size_text_element">18dp</dimen>
     <dimen name="size_number_element">25dp</dimen>
+    <!--*************** Item device log ************** -->
+    <dimen name="size_text_log">15dp</dimen>
 
 
 
