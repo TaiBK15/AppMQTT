@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="4"
+    android:background="@color/colorPrimaryDark">
+
+ <!--=======================ROW 1=============================-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:weightSum="2"
+        android:orientation="horizontal">
+
+        <!--*****************COLUMN 1*********************-->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="@dimen/padding_device_list"
+            android:gravity="center"
+            android:clickable="true">
+
+            <LinearLayout
+                android:id="@+id/ln_device_1"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:orientation="vertical"
+                android:background="@color/colorBackgroundImageDevice_1">
+
+                <ImageView
+                    android:layout_gravity="center"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="@dimen/padding_image_margin_top_device"
+                    android:src="@drawable/ic_sensor"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="@dimen/padding_text_content_device"
+                    android:layout_marginTop="@dimen/padding_text_margin_top_device"
+                    android:background="@color/colorBackgroundTextDevice_1"
+                    android:text="Device 1"
+                    android:textSize="@dimen/size_text_device"
+                    android:textColor="@color/textColorPrimary"
+                    android:textStyle="bold"
+                    android:textAlignment="center"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!--*****************COLUMN 2*********************-->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="@dimen/padding_device_list"
+            android:gravity="center"
+            android:clickable="true">
+
+            <LinearLayout
+                android:id="@+id/ln_device_2"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:orientation="vertical"
+                android:background="@color/colorBackgroundImageDevice_2">
+
+                <ImageView
+                    android:layout_gravity="center"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="@dimen/padding_image_margin_top_device"
+                    android:src="@drawable/ic_sensor"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="@dimen/padding_text_content_device"
+                    android:layout_marginTop="@dimen/padding_text_margin_top_device"
+                    android:background="@color/colorBackgroundTextDevice_2"
+                    android:text="Device 2"
+                    android:textSize="@dimen/size_text_device"
+                    android:textColor="@color/textColorPrimary"
+                    android:textStyle="bold"
+                    android:textAlignment="center"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+<!--=======================ROW 2=============================-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:weightSum="2"
+        android:orientation="horizontal">
+
+        <!--*****************COLUMN 1*********************-->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="@dimen/padding_device_list"
+            android:gravity="center"
+            android:clickable="true">
+
+            <LinearLayout
+                android:id="@+id/ln_device_3"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:orientation="vertical"
+                android:background="@color/colorBackgroundImageDevice_3">
+
+                <ImageView
+                    android:layout_gravity="center"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="@dimen/padding_image_margin_top_device"
+                    android:src="@drawable/ic_sensor"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="@dimen/padding_text_content_device"
+                    android:layout_marginTop="@dimen/padding_text_margin_top_device"
+                    android:background="@color/colorBackgroundTextDevice_3"
+                    android:text="Device 3"
+                    android:textSize="@dimen/size_text_device"
+                    android:textColor="@color/textColorPrimary"
+                    android:textStyle="bold"
+                    android:textAlignment="center"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!--*****************COLUMN 2*********************-->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="@dimen/padding_device_list"
+            android:gravity="center"
+            android:clickable="true">
+
+            <LinearLayout
+                android:id="@+id/ln_device_4"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:orientation="vertical"
+                android:background="@color/colorBackgroundImageDevice_4">
+
+                <ImageView
+                    android:layout_gravity="center"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="@dimen/padding_image_margin_top_device"
+                    android:src="@drawable/ic_sensor"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="@dimen/padding_text_content_device"
+                    android:layout_marginTop="@dimen/padding_text_margin_top_device"
+                    android:background="@color/colorBackgroundTextDevice_4"
+                    android:text="Device 4"
+                    android:textSize="@dimen/size_text_device"
+                    android:textColor="@color/textColorPrimary"
+                    android:textStyle="bold"
+                    android:textAlignment="center"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+<!--=======================ROW 3=============================-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:weightSum="2"
+        android:orientation="horizontal">
+
+        <!--*****************COLUMN 1*********************-->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="@dimen/padding_device_list"
+            android:gravity="center"
+            android:clickable="true">
+
+            <LinearLayout
+                android:id="@+id/ln_device_5"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:orientation="vertical"
+                android:background="@color/colorBackgroundImageDevice_5">
+
+                <ImageView
+                    android:layout_gravity="center"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="@dimen/padding_image_margin_top_device"
+                    android:src="@drawable/ic_sensor"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="@dimen/padding_text_content_device"
+                    android:layout_marginTop="@dimen/padding_text_margin_top_device"
+                    android:background="@color/colorBackgroundTextDevice_5"
+                    android:text="Device 5"
+                    android:textSize="@dimen/size_text_device"
+                    android:textColor="@color/textColorPrimary"
+                    android:textStyle="bold"
+                    android:textAlignment="center"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!--*****************COLUMN 2*********************-->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="@dimen/padding_device_list"
+            android:gravity="center"
+            android:clickable="true">
+
+            <LinearLayout
+                android:id="@+id/ln_device_6"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:orientation="vertical"
+                android:background="@color/colorBackgroundImageDevice_6">
+
+                <ImageView
+                    android:layout_gravity="center"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="@dimen/padding_image_margin_top_device"
+                    android:src="@drawable/ic_sensor"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="@dimen/padding_text_content_device"
+                    android:layout_marginTop="@dimen/padding_text_margin_top_device"
+                    android:background="@color/colorBackgroundTextDevice_6"
+                    android:text="Device 6"
+                    android:textSize="@dimen/size_text_device"
+                    android:textColor="@color/textColorPrimary"
+                    android:textStyle="bold"
+                    android:textAlignment="center"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+<!--=======================ROW 4=============================-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:weightSum="2"
+        android:orientation="horizontal">
+
+        <!--*****************COLUMN 1*********************-->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="@dimen/padding_device_list"
+            android:gravity="center"
+            android:clickable="true">
+
+            <LinearLayout
+                android:id="@+id/ln_device_7"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:orientation="vertical"
+                android:background="@color/colorBackgroundImageDevice_7">
+
+                <ImageView
+                    android:layout_gravity="center"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="@dimen/padding_image_margin_top_device"
+                    android:src="@drawable/ic_sensor"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="@dimen/padding_text_content_device"
+                    android:layout_marginTop="@dimen/padding_text_margin_top_device"
+                    android:background="@color/colorBackgroundTextDevice_7"
+                    android:text="Device 7"
+                    android:textSize="@dimen/size_text_device"
+                    android:textColor="@color/textColorPrimary"
+                    android:textStyle="bold"
+                    android:textAlignment="center"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!--*****************COLUMN 2*********************-->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="@dimen/padding_device_list"
+            android:gravity="center"
+            android:clickable="true">
+
+            <LinearLayout
+                android:id="@+id/ln_device_8"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:orientation="vertical"
+                android:background="@color/colorBackgroundImageDevice_8">
+
+                <ImageView
+                    android:layout_gravity="center"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="@dimen/padding_image_margin_top_device"
+                    android:src="@drawable/ic_sensor"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="@dimen/padding_text_content_device"
+                    android:layout_marginTop="@dimen/padding_text_margin_top_device"
+                    android:background="@color/colorBackgroundTextDevice_8"
+                    android:text="Device 8"
+                    android:textSize="@dimen/size_text_device"
+                    android:textColor="@color/textColorPrimary"
+                    android:textStyle="bold"
+                    android:textAlignment="center"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</LinearLayout>
