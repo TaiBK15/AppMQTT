@@ -49,4 +49,7 @@ dependencies {
 
     // Event bus
     implementation 'org.greenrobot:eventbus:3.0.0'
+
+    // Chart lib
+    implementation 'com.github.lecho:hellocharts-library:1.5.8@aar'
 }

@@ -6,19 +6,24 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.example.mqttapplication.R;
 import com.example.mqttapplication.eventbus.ConnectStatusEvent;
+import com.example.mqttapplication.fragment.FragmentChart;
 import com.example.mqttapplication.roomdatabase.DeviceEntity;
 import com.example.mqttapplication.viewmodel.DeviceDetailViewModel;
 
@@ -30,18 +35,23 @@ import org.json.JSONObject;
 
 import mqttsrc.MqttApi;
 
-public class DeviceDetailActivity extends AppCompatActivity {
+public class DeviceDetailActivity extends AppCompatActivity implements View.OnLongClickListener {
     private final String TAG = this.getClass().getSimpleName();
     private Toolbar deviceToolbar;
     private String title, hostname, topic;
     private boolean connStatus, swStatus;
-    private LinearLayout ln_device_detail;
+    private FrameLayout fr_device_detail;
+    private LinearLayout ln_temp, ln_brightness, ln_humidity;
     private ProgressBar proBarHumidity, proBarBrightness, proBarTemperature;
     private TextView tv_proBarHumidity, tv_proBarBrightness, tv_temp;
     private Switch sw_light;
     private int deviceID, temp, bright, humidity;
     private DeviceDetailViewModel deviceDetailViewModel;
     private MqttApi mqttApi;
+
+    private final int TEMP = 0;
+    private final int BRI = 1;
+    private final int HUM = 2;
 
     public DeviceDetailActivity(){
 
@@ -51,6 +61,15 @@ public class DeviceDetailActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_detail);
+
+        ln_temp = findViewById(R.id.ln_temp);
+        ln_brightness = findViewById(R.id.ln_brightness);
+        ln_humidity = findViewById(R.id.ln_humidity);
+
+        //Set long click on linear layout
+        ln_temp.setOnLongClickListener(this);
+        ln_brightness.setOnLongClickListener(this);
+        ln_humidity.setOnLongClickListener(this);
 
         //Get mqttApi object from MainActivity
         MainActivity mainActivity = new MainActivity();
@@ -68,19 +87,19 @@ public class DeviceDetailActivity extends AppCompatActivity {
 
         //Set data for toolbar
         deviceToolbar = findViewById(R.id.device_detail_toolbar);
-        ln_device_detail = findViewById(R.id.ln_device_detail);
+        fr_device_detail = findViewById(R.id.fr_device_detail);
         setSupportActionBar(deviceToolbar);
         getSupportActionBar().setTitle(title);
 
         //Set initially subtitle
         if(connStatus){
             deviceToolbar.setSubtitle("Connect to " + hostname);
-            ln_device_detail.setVisibility(LinearLayout.VISIBLE);
+            fr_device_detail.setVisibility(LinearLayout.VISIBLE);
         }
 
         else{
             deviceToolbar.setSubtitle("Not found broker MQTT");
-            ln_device_detail.setVisibility(LinearLayout.INVISIBLE);
+            fr_device_detail.setVisibility(LinearLayout.INVISIBLE);
         }
 
         sw_light = findViewById(R.id.sw_light);
@@ -224,11 +243,44 @@ public class DeviceDetailActivity extends AppCompatActivity {
 
         if(connectStatusEvent.isConnected()){
             deviceToolbar.setSubtitle("Connect to " + hostname);
-            ln_device_detail.setVisibility(LinearLayout.VISIBLE);
+            fr_device_detail.setVisibility(LinearLayout.VISIBLE);
         }
         else{
             deviceToolbar.setSubtitle("Not found broker MQTT");
-            ln_device_detail.setVisibility(LinearLayout.INVISIBLE);
+            fr_device_detail.setVisibility(LinearLayout.INVISIBLE);
         }
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        switch (v.getId()){
+            case R.id.ln_temp:
+                goToChartFragment(TEMP);
+                break;
+            case R.id.ln_brightness:
+                goToChartFragment(BRI);
+                break;
+            case R.id.ln_humidity:
+                goToChartFragment(HUM);
+                break;
+        }
+        return false;
+    }
+
+    /**
+     * Go to Chart Fragment
+     */
+    private void goToChartFragment(int type){
+        Bundle bundle =  new Bundle();
+        bundle.putInt("deviceID", deviceID);
+        bundle.putInt("typeChart", type);
+
+        FragmentChart fragmentChart = new FragmentChart();
+        fragmentChart.setArguments(bundle);
+        FragmentTransaction transaction = getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fr_device_detail, fragmentChart)
+                .addToBackStack(null);
+        transaction.commit();
     }
 }
