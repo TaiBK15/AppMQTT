@@ -135,6 +135,19 @@ public class DeviceDetailActivity extends AppCompatActivity implements View.OnLo
                     proBarHumidity.setProgress(device_Entity.getHumidity());
                     tv_proBarHumidity.setText("" + device_Entity.getHumidity() + "%");
                 }
+                else{
+                    //Set data for sensor Temperature
+                    proBarTemperature.setProgress(0);
+                    tv_temp.setText(0 + "\u2103");
+
+                    //Set data for sensor Brightness
+                    proBarBrightness.setProgress(0);
+                    tv_proBarBrightness.setText("" + 0 + "%");
+
+                    //Set data for sensor Humidity
+                    proBarHumidity.setProgress(0);
+                    tv_proBarHumidity.setText("" + 0 + "%");
+                }
             }
 
         });
