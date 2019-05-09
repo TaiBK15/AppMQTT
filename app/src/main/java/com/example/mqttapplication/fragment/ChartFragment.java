@@ -38,7 +38,7 @@ import lecho.lib.hellocharts.model.PointValue;
 import lecho.lib.hellocharts.model.Viewport;
 import lecho.lib.hellocharts.view.LineChartView;
 
-public class FragmentChart extends Fragment {
+public class ChartFragment extends Fragment {
     final String TAG = "Fragment Chart";
     private int deviceID, typeChart;
     private final int TEMP = 0;

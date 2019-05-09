@@ -13,17 +13,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.example.mqttapplication.R;
 import com.example.mqttapplication.eventbus.ConnectStatusEvent;
-import com.example.mqttapplication.fragment.FragmentChart;
+import com.example.mqttapplication.fragment.ChartFragment;
 import com.example.mqttapplication.roomdatabase.DeviceEntity;
 import com.example.mqttapplication.viewmodel.DeviceDetailViewModel;
 
@@ -290,11 +288,11 @@ public class DeviceDetailActivity extends AppCompatActivity implements View.OnLo
         bundle.putInt("deviceID", deviceID);
         bundle.putInt("typeChart", type);
 
-        FragmentChart fragmentChart = new FragmentChart();
-        fragmentChart.setArguments(bundle);
+        ChartFragment chartFragment = new ChartFragment();
+        chartFragment.setArguments(bundle);
         FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fr_device_detail, fragmentChart)
+                .replace(R.id.fr_device_detail, chartFragment)
                 .addToBackStack(null);
         transaction.commit();
     }

@@ -14,13 +14,13 @@ import android.widget.ImageView;
 import com.example.mqttapplication.R;
 import com.example.mqttapplication.viewmodel.MainActivityViewModel;
 
-public class FragmentConnectStatus extends Fragment {
+public class ConnectStatusFragment extends Fragment {
 
     private ImageView imgViewConnStatus;
     private Thread waitConnect;
     private boolean connStatus;
 
-    public FragmentConnectStatus() {
+    public ConnectStatusFragment() {
     }
 
     @Nullable

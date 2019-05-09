@@ -24,9 +24,9 @@ import android.widget.Toast;
 import com.example.mqttapplication.R;
 import com.example.mqttapplication.adapter.ViewPagerAdapter;
 import com.example.mqttapplication.eventbus.ConnectStatusEvent;
-import com.example.mqttapplication.fragment.FragmentConnectStatus;
-import com.example.mqttapplication.fragment.FragmentDeviceList;
-import com.example.mqttapplication.repository.DeviceRepository;
+import com.example.mqttapplication.fragment.ConnectStatusFragment;
+import com.example.mqttapplication.fragment.DeviceListFragment;
+import com.example.mqttapplication.fragment.MapFragment;
 import com.example.mqttapplication.roomdatabase.DeviceEntity;
 import com.example.mqttapplication.viewmodel.MainActivityViewModel;
 
@@ -88,15 +88,16 @@ public class MainActivity extends AppCompatActivity {
 
         toolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setLogo(R.drawable.ic_mqtt_app_small);
+        toolbar.setLogo(R.drawable.logo_bk_small);
 
         tablayout = (TabLayout) findViewById(R.id.tablayout_main_activity);
         viewPager = (ViewPager) findViewById(R.id.viewpager_main_activity);
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
         //Add fragment
-        adapter.addFragment(new FragmentConnectStatus(), "Connect");
-        adapter.addFragment(new FragmentDeviceList(), "Device");
+        adapter.addFragment(new ConnectStatusFragment(), "Connect");
+        adapter.addFragment(new DeviceListFragment(), "Device");
+        adapter.addFragment(new MapFragment(), "Position");
 
         viewPager.setAdapter(adapter);
         tablayout.setupWithViewPager(viewPager);
@@ -104,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
         //Add icon for tablayout
         tablayout.getTabAt(0).setIcon(R.drawable.ic_wifi);
         tablayout.getTabAt(1).setIcon(R.drawable.ic_list);
+        tablayout.getTabAt(2).setIcon(R.drawable.ic_gps);
 
     }
 

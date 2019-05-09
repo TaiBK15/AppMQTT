@@ -23,14 +23,14 @@ import com.example.mqttapplication.repository.DeviceRepository;
 import com.example.mqttapplication.roomdatabase.DeviceEntity;
 import com.example.mqttapplication.viewmodel.MainActivityViewModel;
 
-public class FragmentDeviceList extends Fragment implements View.OnClickListener, View.OnLongClickListener {
+public class DeviceListFragment extends Fragment implements View.OnClickListener, View.OnLongClickListener {
 
     private String hostname, deviceName;
     private int deviceId;
     private LinearLayout device_1, device_2, device_3, device_4,
                          device_5, device_6, device_7, device_8;
 
-    public FragmentDeviceList() {
+    public DeviceListFragment() {
     }
 
     @Nullable
