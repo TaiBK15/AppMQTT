@@ -165,10 +165,12 @@ public class DeviceDetailActivity extends AppCompatActivity implements View.OnLo
                 mqttApi = MainActivity.getMqttApi();
                 try{
                     JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("topic", "device_" + deviceID + "\\/req");
-                    jsonObject.put("deviceID", deviceID);
-                    jsonObject.put("switch", swStatus);
-                    mqttApi.publishToTopic(jsonObject.toString().replace("\\",""), 0, "device_" + deviceID + "/req");
+                    jsonObject.put("topic", "device" + "\\/req");
+//                    jsonObject.put("topic", "device/req");
+                    jsonObject.put("device_id", deviceID);
+                    jsonObject.put("switch_state", swStatus);
+                    mqttApi.publishToTopic(jsonObject.toString().replace("\\",""), 0, "device/req");
+//                    mqttApi.publishToTopic(jsonObject.toString(), 0, "device/req");
                     Log.d(TAG, jsonObject.toString());
                 }catch (JSONException e){
                     e.printStackTrace();
