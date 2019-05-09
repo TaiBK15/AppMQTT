@@ -331,7 +331,7 @@ public class MainActivity extends AppCompatActivity {
 //                Log.w(topic.toString(), message.toString());
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 currentTime = df.format(calendar.getInstance().getTime());
-                Log.d(TAG, currentTime);
+                Log.d(TAG, topic);
                 parseJSONString(message.toString());
                 savingDatabase();
             }

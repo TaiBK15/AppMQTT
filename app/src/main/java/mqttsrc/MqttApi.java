@@ -86,15 +86,8 @@ public class MqttApi {
                     if(dialog != null)
                         dialog.cancel();
 
-                    //Subscribe on 8 topics
-                    subscribeToTopic("device_1/data", 0);
-                    subscribeToTopic("device_2/data", 0);
-                    subscribeToTopic("device_3/data", 0);
-                    subscribeToTopic("device_4/data", 0);
-                    subscribeToTopic("device_5/data", 0);
-                    subscribeToTopic("device_6/data", 0);
-                    subscribeToTopic("device_7/data", 0);
-                    subscribeToTopic("device_8/data", 0);
+                    //Subscribe only 1 topic
+                    subscribeToTopic("device/data", 0);
 
                 }
 

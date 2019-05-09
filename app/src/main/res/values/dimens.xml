@@ -44,6 +44,10 @@
     <dimen name="size_number_element">25dp</dimen>
     <!--*************** Item device log ************** -->
     <dimen name="size_text_log">15dp</dimen>
+    <dimen name="size_text_chart">20dp</dimen>
+    <dimen name="size_button_reset">250dp</dimen>
+
+
 
 
 
