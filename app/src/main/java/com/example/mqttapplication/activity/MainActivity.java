@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.example.mqttapplication.R;
 import com.example.mqttapplication.adapter.ViewPagerAdapter;
 import com.example.mqttapplication.eventbus.ConnectStatusEvent;
+import com.example.mqttapplication.eventbus.GPSLocateEvent;
 import com.example.mqttapplication.fragment.ConnectStatusFragment;
 import com.example.mqttapplication.fragment.DeviceListFragment;
 import com.example.mqttapplication.fragment.MapFragment;
@@ -75,6 +76,9 @@ public class MainActivity extends AppCompatActivity {
     //Calendar
     private Calendar calendar;
     private String currentTime;
+    //Position
+    private double lat, lng;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -330,12 +334,27 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
-//                Log.w(topic.toString(), message.toString());
-                DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                currentTime = df.format(calendar.getInstance().getTime());
                 Log.d(TAG, topic);
-                parseJSONString(message.toString());
-                savingDatabase();
+
+                switch (topic){
+                    case "device/data":
+                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        currentTime = df.format(calendar.getInstance().getTime());
+                        parseJsonData(message.toString());
+                        savingDatabase();
+                        break;
+                    case "gw/gps":
+                        parseJsonLocate(message.toString());
+                        EventBus.getDefault().post(new GPSLocateEvent(lat,lng));
+                        //Save position value to share preference
+                        getApplicationContext().getSharedPreferences("GPS_LOCATE", MODE_PRIVATE)
+                                .edit()
+                                .putLong("GPS_Lat", Double.doubleToRawLongBits(lat))
+                                .putLong("GPS_Long", Double.doubleToRawLongBits(lng))
+                                .commit();
+                        break;
+                }
+
             }
 
             @Override
@@ -346,16 +365,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Parse JSON object
+     * Parse JSON object with data value
      * @return
      */
-    private void parseJSONString(String mess) throws JSONException {
+    private void parseJsonData(String mess) throws JSONException {
         JSONObject parse = new JSONObject(mess);
         deviceID = parse.getInt("device_ID");
         JSONObject param = parse.getJSONObject("param");
         temp = param.getInt("sensor_temp");
         bright = param.getInt("sensor_bright");
         humidity = param.getInt("sensor_humidity");
+    }
+
+    /**
+     *  Parse JSON object with position value
+     */
+    private void parseJsonLocate(String pos) throws JSONException {
+        JSONObject parse = new JSONObject(pos);
+        JSONObject param = parse.getJSONObject("gps");
+        lat = param.getDouble("gps_lat");
+        lng = param.getDouble("gps_long");
+        Log.d(TAG, lat + "");
+        Log.d(TAG, lng + "");
+
     }
 
     /**

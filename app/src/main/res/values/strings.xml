@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">BK IoT monitor</string>
+    <string name="app_name">BK LoRa System</string>
     <string name="title_activity_maps">Map</string>
 </resources>
