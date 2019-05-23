@@ -2,9 +2,15 @@ package com.example.mqttapplication.activity;
 
 import android.app.Dialog;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -24,11 +30,17 @@ import android.widget.Toast;
 import com.example.mqttapplication.R;
 import com.example.mqttapplication.adapter.ViewPagerAdapter;
 import com.example.mqttapplication.eventbus.ConnectStatusEvent;
-import com.example.mqttapplication.fragment.FragmentConnectStatus;
-import com.example.mqttapplication.fragment.FragmentDeviceList;
-import com.example.mqttapplication.repository.DeviceRepository;
+import com.example.mqttapplication.eventbus.GPSLocateEvent;
+import com.example.mqttapplication.fragment.ConnectStatusFragment;
+import com.example.mqttapplication.fragment.DeviceListFragment;
+import com.example.mqttapplication.fragment.MapFragment;
 import com.example.mqttapplication.roomdatabase.DeviceEntity;
 import com.example.mqttapplication.viewmodel.MainActivityViewModel;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -46,8 +58,9 @@ import java.util.Calendar;
 import mqttsrc.MqttApi;
 
 public class MainActivity extends AppCompatActivity {
-    static final String TAG = "MainActivity";
+    static final String TAG = "MainActivityDebug";
 
+    private WifiManager wifiManager;
     //Main activity
     private TabLayout tablayout;
     private ViewPager viewPager;
@@ -75,6 +88,9 @@ public class MainActivity extends AppCompatActivity {
     //Calendar
     private Calendar calendar;
     private String currentTime;
+    //Position
+    private double lat, lng;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,15 +104,16 @@ public class MainActivity extends AppCompatActivity {
 
         toolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setLogo(R.drawable.ic_mqtt_app_small);
+        toolbar.setLogo(R.drawable.logo_bk_small);
 
         tablayout = (TabLayout) findViewById(R.id.tablayout_main_activity);
         viewPager = (ViewPager) findViewById(R.id.viewpager_main_activity);
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
         //Add fragment
-        adapter.addFragment(new FragmentConnectStatus(), "Connect");
-        adapter.addFragment(new FragmentDeviceList(), "Device");
+        adapter.addFragment(new ConnectStatusFragment(), "Connect");
+        adapter.addFragment(new DeviceListFragment(), "Device");
+        adapter.addFragment(new MapFragment(), "Position");
 
         viewPager.setAdapter(adapter);
         tablayout.setupWithViewPager(viewPager);
@@ -104,7 +121,59 @@ public class MainActivity extends AppCompatActivity {
         //Add icon for tablayout
         tablayout.getTabAt(0).setIcon(R.drawable.ic_wifi);
         tablayout.getTabAt(1).setIcon(R.drawable.ic_list);
+        tablayout.getTabAt(2).setIcon(R.drawable.ic_gps);
 
+        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if(wifiManager.isWifiEnabled()){
+            Log.d(TAG, "Wifi online");
+            /**
+             * TO DO
+             * Xoa database tren dien thoai va cap nhat du lieu tu cloud
+             */
+        }
+        else
+            Log.d(TAG, "Wifi offline");
+    }
+
+    private BroadcastReceiver wifiStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int wifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN);
+            switch (wifiState){
+                case WifiManager.WIFI_STATE_ENABLED:
+                    Log.d(TAG, "WIFI ONLINE");
+                    /**
+                     * TO DO
+                     * Xoa database tren dien thoai va cap nhat du lieu tu cloud
+                     */
+                    break;
+                case WifiManager.WIFI_STATE_DISABLED:
+                    Log.d(TAG, "WIFI OFFLINE");
+                    break;
+            }
+        }
+    };
+
+    private void getDataFireBase(){
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        database.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        IntentFilter intentFilter = new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        registerReceiver(wifiStateReceiver, intentFilter);
     }
 
     @Override
@@ -117,6 +186,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         isRunning = false;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(wifiStateReceiver);
     }
 
     @Override
@@ -328,12 +403,27 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
-//                Log.w(topic.toString(), message.toString());
-                DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                currentTime = df.format(calendar.getInstance().getTime());
                 Log.d(TAG, topic);
-                parseJSONString(message.toString());
-                savingDatabase();
+
+                switch (topic){
+                    case "device/data":
+//                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//                        currentTime = df.format(calendar.getInstance().getTime());
+                        parseJsonData(message.toString());
+                        savingDatabase();
+                        break;
+                    case "gw/gps":
+                        parseJsonLocate(message.toString());
+                        EventBus.getDefault().post(new GPSLocateEvent(lat,lng));
+                        //Save position value to share preference
+                        getApplicationContext().getSharedPreferences("GPS_LOCATE", MODE_PRIVATE)
+                                .edit()
+                                .putLong("GPS_Lat", Double.doubleToRawLongBits(lat))
+                                .putLong("GPS_Long", Double.doubleToRawLongBits(lng))
+                                .commit();
+                        break;
+                }
+
             }
 
             @Override
@@ -344,16 +434,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Parse JSON object
+     * Parse JSON object with data value
      * @return
      */
-    private void parseJSONString(String mess) throws JSONException {
+    private void parseJsonData(String mess) throws JSONException {
         JSONObject parse = new JSONObject(mess);
         deviceID = parse.getInt("device_ID");
+        currentTime = parse.getString("cur_time");
         JSONObject param = parse.getJSONObject("param");
         temp = param.getInt("sensor_temp");
         bright = param.getInt("sensor_bright");
         humidity = param.getInt("sensor_humidity");
+    }
+
+    /**
+     *  Parse JSON object with position value
+     */
+    private void parseJsonLocate(String pos) throws JSONException {
+        JSONObject parse = new JSONObject(pos);
+        JSONObject param = parse.getJSONObject("gps");
+        lat = param.getDouble("gps_lat");
+        lng = param.getDouble("gps_long");
+        Log.d(TAG, lat + "");
+        Log.d(TAG, lng + "");
+
     }
 
     /**

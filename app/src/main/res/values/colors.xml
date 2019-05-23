@@ -6,6 +6,7 @@
     <color name="colorThird">#424242</color>
     <color name="colorAccent">#00DCC5</color>
     <color name="colorTransparent">#00000000</color>
+    <color name="colorTitleToolbar">#0089DB</color>
 
     <!--Color Theme-->
     <color name="textColorPrimary">#FFFFFF</color>
