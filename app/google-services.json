@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "596120889035",
+    "firebase_url": "https://lora-system-33293.firebaseio.com",
+    "project_id": "lora-system-33293",
+    "storage_bucket": "lora-system-33293.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:596120889035:android:f28fafcbf89424f7",
+        "android_client_info": {
+          "package_name": "com.example.mqttapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "596120889035-00gdfg4ogf4bh8rb0t623istvif8o1rr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDK9gTPSXvYXdOwgUFKXZDTtrkuagMi9WA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "596120889035-00gdfg4ogf4bh8rb0t623istvif8o1rr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

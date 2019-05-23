@@ -2,9 +2,15 @@ package com.example.mqttapplication.activity;
 
 import android.app.Dialog;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -30,6 +36,11 @@ import com.example.mqttapplication.fragment.DeviceListFragment;
 import com.example.mqttapplication.fragment.MapFragment;
 import com.example.mqttapplication.roomdatabase.DeviceEntity;
 import com.example.mqttapplication.viewmodel.MainActivityViewModel;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -47,8 +58,9 @@ import java.util.Calendar;
 import mqttsrc.MqttApi;
 
 public class MainActivity extends AppCompatActivity {
-    static final String TAG = "MainActivity";
+    static final String TAG = "MainActivityDebug";
 
+    private WifiManager wifiManager;
     //Main activity
     private TabLayout tablayout;
     private ViewPager viewPager;
@@ -111,6 +123,57 @@ public class MainActivity extends AppCompatActivity {
         tablayout.getTabAt(1).setIcon(R.drawable.ic_list);
         tablayout.getTabAt(2).setIcon(R.drawable.ic_gps);
 
+        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if(wifiManager.isWifiEnabled()){
+            Log.d(TAG, "Wifi online");
+            /**
+             * TO DO
+             * Xoa database tren dien thoai va cap nhat du lieu tu cloud
+             */
+        }
+        else
+            Log.d(TAG, "Wifi offline");
+    }
+
+    private BroadcastReceiver wifiStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int wifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN);
+            switch (wifiState){
+                case WifiManager.WIFI_STATE_ENABLED:
+                    Log.d(TAG, "WIFI ONLINE");
+                    /**
+                     * TO DO
+                     * Xoa database tren dien thoai va cap nhat du lieu tu cloud
+                     */
+                    break;
+                case WifiManager.WIFI_STATE_DISABLED:
+                    Log.d(TAG, "WIFI OFFLINE");
+                    break;
+            }
+        }
+    };
+
+    private void getDataFireBase(){
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        database.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        IntentFilter intentFilter = new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        registerReceiver(wifiStateReceiver, intentFilter);
     }
 
     @Override
@@ -123,6 +186,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         isRunning = false;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(wifiStateReceiver);
     }
 
     @Override
@@ -338,8 +407,8 @@ public class MainActivity extends AppCompatActivity {
 
                 switch (topic){
                     case "device/data":
-                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        currentTime = df.format(calendar.getInstance().getTime());
+//                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//                        currentTime = df.format(calendar.getInstance().getTime());
                         parseJsonData(message.toString());
                         savingDatabase();
                         break;
@@ -371,6 +440,7 @@ public class MainActivity extends AppCompatActivity {
     private void parseJsonData(String mess) throws JSONException {
         JSONObject parse = new JSONObject(mess);
         deviceID = parse.getInt("device_ID");
+        currentTime = parse.getString("cur_time");
         JSONObject param = parse.getJSONObject("param");
         temp = param.getInt("sensor_temp");
         bright = param.getInt("sensor_bright");
