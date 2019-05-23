@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -51,16 +53,14 @@ import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 
 import mqttsrc.MqttApi;
 
 public class MainActivity extends AppCompatActivity {
     static final String TAG = "MainActivityDebug";
 
-    private WifiManager wifiManager;
     //Main activity
     private TabLayout tablayout;
     private ViewPager viewPager;
@@ -90,6 +90,9 @@ public class MainActivity extends AppCompatActivity {
     private String currentTime;
     //Position
     private double lat, lng;
+    //Fire Database
+    private FirebaseDatabase mDatabase;
+    private DatabaseReference mGetReference;
 
 
     @Override
@@ -123,36 +126,83 @@ public class MainActivity extends AppCompatActivity {
         tablayout.getTabAt(1).setIcon(R.drawable.ic_list);
         tablayout.getTabAt(2).setIcon(R.drawable.ic_gps);
 
-        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if(wifiManager.isWifiEnabled()){
-            Log.d(TAG, "Wifi online");
-            /**
-             * TO DO
-             * Xoa database tren dien thoai va cap nhat du lieu tu cloud
-             */
-        }
-        else
-            Log.d(TAG, "Wifi offline");
+        mDatabase = FirebaseDatabase.getInstance();
+        mGetReference = mDatabase.getReference();
+//        mGetReference.removeValue();
+        mGetReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    //Get entire data from realtime database
+                    HashMap<String, Object> dataMap = (HashMap<String, Object>) dataSnapshot.getValue();
+                    //Check all device ID from database
+                    for (String deviceID : dataMap.keySet()) {
+                        Log.d(TAG, "===========key: " + deviceID + "===========");
+                        //Get all objects from device id
+                        Object numDeviceData = dataMap.get(deviceID);
+                        HashMap<String, Object> allDeviceData = (HashMap<String, Object>) numDeviceData;
+                        //Check all key in each device id
+                        for (String key : allDeviceData.keySet()){
+                            Object data = allDeviceData.get(key);
+                            HashMap<String, Object> sensor = (HashMap<String, Object>) data;
+                            Log.d(TAG, "currentTime: " + sensor.get("time"));
+                            Log.d(TAG, "bright: " + sensor.get("bright"));
+                            Log.d(TAG, "temp: " + sensor.get("temp"));
+                            Log.d(TAG, "humidity: " + sensor.get("humidity"));
+                            Log.d(TAG, "-------------------------------------");
+                        }
+//
+//                        try{
+//
+//                            String mString = String.valueOf(dataMap.get(key));
+//                            Log.d(TAG, mString + "");
+//
+//
+//                        }catch (ClassCastException cce2){
+//
+//                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
-    private BroadcastReceiver wifiStateReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver networkStateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            int wifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN);
-            switch (wifiState){
-                case WifiManager.WIFI_STATE_ENABLED:
-                    Log.d(TAG, "WIFI ONLINE");
-                    /**
-                     * TO DO
-                     * Xoa database tren dien thoai va cap nhat du lieu tu cloud
-                     */
-                    break;
-                case WifiManager.WIFI_STATE_DISABLED:
-                    Log.d(TAG, "WIFI OFFLINE");
-                    break;
+            try
+            {
+                if (isOnline(context)) {
+                    Log.d(TAG, "ACCESS INTERNET SUCCESS!");
+
+                } else {
+                    Log.d(TAG, "ACCESS INTERNET FAIL!");
+                }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
             }
         }
+
+
     };
+
+    private boolean isOnline(Context context) {
+        try {
+            ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo netInfo = connectivityManager.getActiveNetworkInfo();
+            //should check null because in airplane mode it will be null
+            return (netInfo != null && netInfo.isConnected());
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     private void getDataFireBase(){
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
@@ -172,8 +222,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        IntentFilter intentFilter = new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION);
-        registerReceiver(wifiStateReceiver, intentFilter);
+        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkStateReceiver, intentFilter);
     }
 
     @Override
@@ -191,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(wifiStateReceiver);
+        unregisterReceiver(networkStateReceiver);
     }
 
     @Override
