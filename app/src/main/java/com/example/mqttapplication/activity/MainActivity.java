@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
     //Fire Database
     private FirebaseDatabase mDatabase;
     private DatabaseReference mGetReference;
+    private ValueEventListener eventListener;
 
 
     @Override
@@ -126,51 +127,8 @@ public class MainActivity extends AppCompatActivity {
         tablayout.getTabAt(1).setIcon(R.drawable.ic_list);
         tablayout.getTabAt(2).setIcon(R.drawable.ic_gps);
 
-        mDatabase = FirebaseDatabase.getInstance();
-        mGetReference = mDatabase.getReference();
-//        mGetReference.removeValue();
-        mGetReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    //Get entire data from realtime database
-                    HashMap<String, Object> dataMap = (HashMap<String, Object>) dataSnapshot.getValue();
-                    //Check all device ID from database
-                    for (String deviceID : dataMap.keySet()) {
-                        Log.d(TAG, "===========key: " + deviceID + "===========");
-                        //Get all objects from device id
-                        Object numDeviceData = dataMap.get(deviceID);
-                        HashMap<String, Object> allDeviceData = (HashMap<String, Object>) numDeviceData;
-                        //Check all key in each device id
-                        for (String key : allDeviceData.keySet()){
-                            Object data = allDeviceData.get(key);
-                            HashMap<String, Object> sensor = (HashMap<String, Object>) data;
-                            Log.d(TAG, "currentTime: " + sensor.get("time"));
-                            Log.d(TAG, "bright: " + sensor.get("bright"));
-                            Log.d(TAG, "temp: " + sensor.get("temp"));
-                            Log.d(TAG, "humidity: " + sensor.get("humidity"));
-                            Log.d(TAG, "-------------------------------------");
-                        }
-//
-//                        try{
-//
-//                            String mString = String.valueOf(dataMap.get(key));
-//                            Log.d(TAG, mString + "");
-//
-//
-//                        }catch (ClassCastException cce2){
-//
-//                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
+        //Create viewmodel object
+        model = ViewModelProviders.of(this).get(MainActivityViewModel.class);
     }
 
     private BroadcastReceiver networkStateReceiver = new BroadcastReceiver() {
@@ -180,9 +138,12 @@ public class MainActivity extends AppCompatActivity {
             {
                 if (isOnline(context)) {
                     Log.d(TAG, "ACCESS INTERNET SUCCESS!");
+//                    getDataFireBase();
 
                 } else {
                     Log.d(TAG, "ACCESS INTERNET FAIL!");
+//                    if (mGetReference != null && eventListener != null)
+//                        mGetReference.removeEventListener(eventListener);
                 }
             } catch (NullPointerException e) {
                 e.printStackTrace();
@@ -205,10 +166,55 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getDataFireBase(){
-        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        database.addValueEventListener(new ValueEventListener() {
+        mDatabase = FirebaseDatabase.getInstance();
+        mGetReference = mDatabase.getReference();
+//        mGetReference.removeValue();
+         eventListener = mGetReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                SharedPreferences mqttConnInfo = getSharedPreferences("MQTTConnectionSetup", MODE_PRIVATE);
+                boolean conn = mqttConnInfo.getBoolean("connStatus", false);
+                if (dataSnapshot.exists() && conn && isOnline(getApplicationContext())) {
+                    model.deleteDatabase();
+                    //Get entire data from realtime database
+                    HashMap<String, Object> dataMap = (HashMap<String, Object>) dataSnapshot.getValue();
+                    //Check all device ID from database
+                    for (String deviceID : dataMap.keySet()) {
+                        Log.d(TAG, "===========key: " + deviceID + "===========");
+                        //Get all objects from device id
+                        Object numDeviceData = dataMap.get(deviceID);
+                        HashMap<String, Object> allDeviceData = (HashMap<String, Object>) numDeviceData;
+                        //Check all key in each device id
+                        for (String key : allDeviceData.keySet()){
+                            Object data = allDeviceData.get(key);
+                            HashMap<String, Object> sensor = (HashMap<String, Object>) data;
+                            Log.d(TAG, "currentTime: " + sensor.get("time"));
+                            Log.d(TAG, "bright: " + sensor.get("bright"));
+                            Log.d(TAG, "temp: " + sensor.get("temp"));
+                            Log.d(TAG, "humidity: " + sensor.get("humidity"));
+                            Log.d(TAG, "-------------------------------------");
+                            int id = Character.getNumericValue(deviceID.charAt(deviceID.length()-1));
+                            temp = Integer.parseInt(sensor.get("temp")+"");
+                            bright = Integer.parseInt(sensor.get("bright")+"");
+                            humidity = Integer.parseInt(sensor.get("humidity")+"");
+                            model.insert(new DeviceEntity((String)sensor.get("time"), id, temp, bright, humidity));
+                        }
+//
+//                        try{
+//
+//                            String mString = String.valueOf(dataMap.get(key));
+//                            Log.d(TAG, mString + "");
+//
+//
+//                        }catch (ClassCastException cce2){
+//
+//                        }
+                    }
+
+                    mGetReference.removeEventListener(eventListener);
+                }
+                else
+                    mGetReference.removeEventListener(eventListener);
 
             }
 
@@ -217,6 +223,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
     }
 
     @Override
@@ -401,9 +408,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        //Create viewmodel object
-        model = ViewModelProviders.of(this).get(MainActivityViewModel.class);
-
         String hostserver = "tcp://" + hostname + ":" + port;
         mqttApi = new MqttApi(getApplicationContext(), hostserver, username, password);
         mqttApi.setDialog(dialog_animation);
@@ -424,6 +428,7 @@ public class MainActivity extends AppCompatActivity {
                 //Save connect status to viewmodels
                 model.setConnStatus(isConnected);
 
+                getDataFireBase();
                 //Publish event
                 if (isRunning != true) {
                     EventBus.getDefault().post(new ConnectStatusEvent(isConnected));
