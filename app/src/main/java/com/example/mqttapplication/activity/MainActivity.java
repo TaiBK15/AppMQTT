@@ -101,6 +101,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Set login state is success
+        SharedPreferences.Editor login_state = getSharedPreferences("Login_State", MODE_PRIVATE).edit();
+        login_state.putBoolean("loginState", true);
+
         //Connect to mqtt server in the first time
         restorePreference();
         if (!(hostname.equals("") || port.equals("") || username.equals("") || password.equals("")))
@@ -165,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void getDataFireBase(){
         mDatabase = FirebaseDatabase.getInstance();
-        mGetReference = mDatabase.getReference();
+        mGetReference = mDatabase.getReference("End_device");
 //        mGetReference.removeValue();
          eventListener = mGetReference.addValueEventListener(new ValueEventListener() {
             @Override

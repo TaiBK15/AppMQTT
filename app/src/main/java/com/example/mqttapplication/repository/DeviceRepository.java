@@ -7,11 +7,16 @@ import android.os.AsyncTask;
 import com.example.mqttapplication.roomdatabase.DeviceDao;
 import com.example.mqttapplication.roomdatabase.DeviceDatabase;
 import com.example.mqttapplication.roomdatabase.DeviceEntity;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.List;
 
 public class DeviceRepository {
     private DeviceDao deviceDao;
+    //Fire Database
+    private FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+    private DatabaseReference mGetReference;
 
     public DeviceRepository(Application application){
         DeviceDatabase database = DeviceDatabase.getInstance(application);
@@ -24,6 +29,8 @@ public class DeviceRepository {
 
     public void deleteAll(int deviceID){
         new DeleteAsyncTask(deviceDao).execute(deviceID);
+        mGetReference = mDatabase.getReference("End_device/deviceID_" + deviceID);
+        mGetReference.removeValue();
     }
 
     public void deleteDatabase(){new DeleteAllAsyncTask(deviceDao).execute();}

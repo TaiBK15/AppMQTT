@@ -4,6 +4,18 @@
     <dimen name="size_icon_connection_status">200dp</dimen>
 
                     <!-- Padding -->
+    <!--*************** Login ************** -->
+    <dimen name="image_size">150dp</dimen>
+    <dimen name="ln_image_size">300dp</dimen>
+    <dimen name="text_welcome">15dp</dimen>
+    <dimen name="text_app">25dp</dimen>
+    <dimen name="heigh_text">50dp</dimen>
+    <dimen name="space">10dp</dimen>
+    <dimen name="margin">7dp</dimen>
+    <dimen name="margin_top_button">15dp</dimen>
+    <dimen name="margin_left_check">30dp</dimen>
+    <dimen name="space_check_box">80dp</dimen>
+
     <!--*************** Device List ************** -->
     <dimen name="padding_device_list">10dp</dimen>
     <dimen name="padding_image_margin_top_device">20dp</dimen>
@@ -17,7 +29,7 @@
     <dimen name="height_edit_text">40dp</dimen>
     <dimen name="height_title">40dp</dimen>
     <dimen name="padding_margin_element">8dp</dimen>
-    <dimen name="padding_left_edit_text">15dp</dimen>
+    <dimen name="padding_left_edit_text">25dp</dimen>
     <dimen name="margin_top_edit_text">3dp</dimen>
     <!--*************** Device Detail Element ************** -->
     <dimen name="margin_left_element">15dp</dimen>

@@ -42,6 +42,7 @@
 
     <!--Color Stroke for Edit text dialog-->
     <color name="colorStrokeTextDialog">#CE93D8</color>
+    <color name="colorHintLogin">#AAFFFFFF</color>
 
 
 </resources>
