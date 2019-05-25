@@ -127,8 +127,6 @@ public class MainActivity extends AppCompatActivity {
         tablayout.getTabAt(1).setIcon(R.drawable.ic_list);
         tablayout.getTabAt(2).setIcon(R.drawable.ic_gps);
 
-        //Create viewmodel object
-        model = ViewModelProviders.of(this).get(MainActivityViewModel.class);
     }
 
     private BroadcastReceiver networkStateReceiver = new BroadcastReceiver() {
@@ -407,6 +405,9 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+
+        //Create viewmodel object
+        model = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
         String hostserver = "tcp://" + hostname + ":" + port;
         mqttApi = new MqttApi(getApplicationContext(), hostserver, username, password);
