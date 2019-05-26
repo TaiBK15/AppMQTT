@@ -4,9 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <item
-        android:id="@+id/main_item_menu"
+        android:id="@+id/settings"
         android:icon="@drawable/ic_setting"
         android:title="Settings"
+        app:showAsAction="ifRoom">
+    </item>
+
+    <item
+        android:id="@+id/logout"
+        android:icon="@drawable/ic_logout"
+        android:title="Log out"
         app:showAsAction="ifRoom">
     </item>
 

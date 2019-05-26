@@ -38,6 +38,7 @@ import com.example.mqttapplication.fragment.DeviceListFragment;
 import com.example.mqttapplication.fragment.MapFragment;
 import com.example.mqttapplication.roomdatabase.DeviceEntity;
 import com.example.mqttapplication.viewmodel.MainActivityViewModel;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -104,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
         //Set login state is success
         SharedPreferences.Editor login_state = getSharedPreferences("Login_State", MODE_PRIVATE).edit();
         login_state.putBoolean("loginState", true);
+        login_state.commit();
 
         //Connect to mqtt server in the first time
         restorePreference();
@@ -133,6 +135,82 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkStateReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isRunning = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        isRunning = false;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(networkStateReceiver);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id){
+            case R.id.settings:
+                dialogConnectSetting();
+                return true;
+            case R.id.logout:
+                logOut();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void logOut(){
+        FirebaseAuth.getInstance().signOut();
+        //Set login state is success
+        SharedPreferences.Editor login_state = getSharedPreferences("Login_State", MODE_PRIVATE).edit();
+        login_state.putBoolean("loginState", false);
+        login_state.commit();
+
+        //Disconnect the MQTT client to avoid running callback method
+        if (mqttAndroidClient != null) {
+            try {
+                mqttApi.disconnect(mqttAndroidClient);
+            } catch (MqttException e) {
+                e.printStackTrace();
+            }
+        }
+
+        goToLoginActivity();
+
+    }
+
+    private void goToLoginActivity(){
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    /**
+     * Receiver network state change event
+     */
     private BroadcastReceiver networkStateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -140,21 +218,21 @@ public class MainActivity extends AppCompatActivity {
             {
                 if (isOnline(context)) {
                     Log.d(TAG, "ACCESS INTERNET SUCCESS!");
-//                    getDataFireBase();
 
                 } else {
                     Log.d(TAG, "ACCESS INTERNET FAIL!");
-//                    if (mGetReference != null && eventListener != null)
-//                        mGetReference.removeEventListener(eventListener);
                 }
             } catch (NullPointerException e) {
                 e.printStackTrace();
             }
         }
-
-
     };
 
+    /**
+     * Check connectivity state
+     * @param context
+     * @return
+     */
     private boolean isOnline(Context context) {
         try {
             ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -167,11 +245,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    /**
+     * Get data from real time database Firebase
+     */
     private void getDataFireBase(){
         mDatabase = FirebaseDatabase.getInstance();
         mGetReference = mDatabase.getReference("End_device");
-//        mGetReference.removeValue();
-         eventListener = mGetReference.addValueEventListener(new ValueEventListener() {
+        eventListener = mGetReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 SharedPreferences mqttConnInfo = getSharedPreferences("MQTTConnectionSetup", MODE_PRIVATE);
@@ -226,49 +307,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        registerReceiver(networkStateReceiver, intentFilter);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        isRunning = true;
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        isRunning = false;
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(networkStateReceiver);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.main_item_menu) {
-            dialogConnectSetting();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     /**

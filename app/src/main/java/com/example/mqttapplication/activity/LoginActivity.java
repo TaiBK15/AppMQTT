@@ -8,9 +8,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.text.method.PasswordTransformationMethod;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.mqttapplication.R;
@@ -26,9 +28,10 @@ public class LoginActivity extends AppCompatActivity {
     private EditText edt_email, edt_password;
     private CheckBox showpw, remember;
     private Button btn_login;
+    private ProgressBar prBar;
 
     private String email, password;
-    private boolean isSave, isLogin;
+    private boolean isSave, isLogin, isShowpw;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,65 +39,81 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences login_state = getSharedPreferences("Login_State", MODE_PRIVATE);
         isLogin = login_state.getBoolean("loginState", false);
         if(isLogin){
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            finish();
+           goToMainActivity();
         }
-        else
-        setContentView(R.layout.activity_login);
+        else {
+            setContentView(R.layout.activity_login);
 
-        edt_email = findViewById(R.id.edt_email);
-        edt_password = findViewById(R.id.edt_password_login);
-        btn_login = findViewById(R.id.btn_login);
-        showpw = findViewById(R.id.check_show_password);
-        remember = findViewById(R.id.check_remember);
+            mAuth = FirebaseAuth.getInstance();
 
-        mAuth = FirebaseAuth.getInstance();
+            edt_email = findViewById(R.id.edt_email);
+            edt_password = findViewById(R.id.edt_password_login);
+            btn_login = findViewById(R.id.btn_login);
+            showpw = findViewById(R.id.check_show_password);
+            remember = findViewById(R.id.check_remember);
+            prBar = findViewById(R.id.progressBarLogin);
 
-        SharedPreferences account = getSharedPreferences("User_Account", MODE_PRIVATE);
-        email = account.getString("email","");
-        password = account.getString("password", "");
-        isSave = account.getBoolean("remember", false);
-        edt_email.setText(email);
-        edt_password.setText(password);
-        remember.setChecked(isSave);
+            SharedPreferences account = getSharedPreferences("User_Account", MODE_PRIVATE);
+            email = account.getString("email", "");
+            password = account.getString("password", "");
+            isSave = account.getBoolean("remember", false);
+            isShowpw = account.getBoolean("showpw", false);
+            edt_email.setText(email);
+            edt_password.setText(password);
+            remember.setChecked(isSave);
+            showpw.setChecked(isShowpw);
 
-        btn_login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loginUserAccount();
-            }
-        });
+            //Show and hide password
+            if (showpw.isChecked())
+                edt_password.setTransformationMethod(null);
+            else
+                edt_password.setTransformationMethod(new PasswordTransformationMethod());
 
-        //Set click on checkbox show password
-        showpw.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Show and hide password
-                if (showpw.isChecked())
-                    edt_password.setTransformationMethod(null);
-                else
-                    edt_password.setTransformationMethod(new PasswordTransformationMethod());
+            btn_login.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    loginUserAccount();
+                }
+            });
 
-                edt_password.setSelection(edt_password.getText().length());
-            }
-        });
+            //Set click on checkbox show password
+            showpw.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //Show and hide password
+                    if (showpw.isChecked())
+                        edt_password.setTransformationMethod(null);
+                    else
+                        edt_password.setTransformationMethod(new PasswordTransformationMethod());
 
-        //Set click on checkbox remember me
-        remember.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Save email & password
-                if (remember.isChecked())
-                    isSave = true;
-                else
-                    isSave = false;
-            }
-        });
+                    edt_password.setSelection(edt_password.getText().length());
+                }
+            });
+
+            //Set click on checkbox remember me
+            remember.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //Save email & password
+                    if (remember.isChecked())
+                        isSave = true;
+                    else
+                        isSave = false;
+                }
+            });
+        }
+    }
+
+    private void goToMainActivity(){
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void loginUserAccount() {
+        prBar.setVisibility(View.VISIBLE);
+
         email = edt_email.getText().toString();
         password = edt_password.getText().toString();
 
@@ -107,13 +126,14 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        mAuth.signInWithEmailAndPassword(email, password)
+        mAuth.signInWithEmailAndPassword(email + "@gmail.com", password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             SharedPreferences.Editor account = getSharedPreferences("User_Account", MODE_PRIVATE).edit();
                             account.putBoolean("remember", isSave);
+                            account.putBoolean("showpw", showpw.isChecked());
                             if(isSave){
                                 account.putString("email", email);
                                 account.putString("password", password);
@@ -123,17 +143,12 @@ public class LoginActivity extends AppCompatActivity {
                             }
                             account.commit();
 
-                            try {
-                                Thread.sleep(2000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
-                            finish();
+                            prBar.setVisibility(View.GONE);
+
+                            goToMainActivity();
                         }
                         else {
+                            prBar.setVisibility(View.GONE);
                             Toast.makeText(getApplicationContext(), "Login failed! Please try again later", Toast.LENGTH_LONG).show();
                         }
                     }
