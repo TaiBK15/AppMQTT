@@ -38,7 +38,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textColor="@color/colorTitleToolbar"
+                android:textColor="@color/colorTitle"
                 android:textStyle="bold"
                 android:textSize="@dimen/text_app"
                 android:text="@string/app_name_upper"/>
@@ -131,18 +131,24 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="@dimen/margin_top_button"
-            android:background="@color/colorBackgroundImageDevice_1"
+            android:background="@drawable/bkg_button"
             android:textColor="@color/textColorPrimary"
             android:textStyle="bold"
             android:text="Log in"/>
 
-        <ProgressBar
-            android:id="@+id/progressBarLogin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="@dimen/margin_top_button"
-            android:visibility="gone" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/space_check_box"
+            android:gravity="center">
+
+            <ProgressBar
+                android:id="@+id/progressBarLogin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin"
+                android:visibility="gone" />
+        </LinearLayout>
+
     </LinearLayout>
 
 </ScrollView>
