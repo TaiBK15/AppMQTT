@@ -81,7 +81,6 @@ public class MqttApi {
                     disconnectedBufferOptions.setPersistBuffer(false);
                     disconnectedBufferOptions.setDeleteOldestMessages(false);
                     mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
-                    Log.d(TAG, "Connected MQTT successfully");
 
                     if(dialog != null)
                         dialog.cancel();

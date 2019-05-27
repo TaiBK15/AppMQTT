@@ -7,11 +7,16 @@ import android.os.AsyncTask;
 import com.example.mqttapplication.roomdatabase.DeviceDao;
 import com.example.mqttapplication.roomdatabase.DeviceDatabase;
 import com.example.mqttapplication.roomdatabase.DeviceEntity;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.List;
 
 public class DeviceRepository {
     private DeviceDao deviceDao;
+    //Fire Database
+    private FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+    private DatabaseReference mGetReference;
 
     public DeviceRepository(Application application){
         DeviceDatabase database = DeviceDatabase.getInstance(application);
@@ -24,7 +29,11 @@ public class DeviceRepository {
 
     public void deleteAll(int deviceID){
         new DeleteAsyncTask(deviceDao).execute(deviceID);
+        mGetReference = mDatabase.getReference("End_device/deviceID_" + deviceID);
+        mGetReference.removeValue();
     }
+
+    public void deleteDatabase(){new DeleteAllAsyncTask(deviceDao).execute();}
 
     public LiveData<DeviceEntity> getLatestData(int deviceID) {
         return deviceDao.getLatestData(deviceID);
@@ -79,7 +88,7 @@ public class DeviceRepository {
     }
 
     /**
-     * Class delete all data in database
+     * Class delete all data with device ID
      */
     private static class DeleteAsyncTask extends AsyncTask<Integer, Void, Void>{
 
@@ -92,6 +101,24 @@ public class DeviceRepository {
         @Override
         protected Void doInBackground(Integer... integers) {
             asyncTaskDao.deleteAll(integers[0]);
+            return null;
+        }
+    }
+
+    /**
+     * Class delete all data in database
+     */
+    private static class DeleteAllAsyncTask extends AsyncTask<Void, Void, Void>{
+
+        private DeviceDao asyncTaskDao;
+
+        DeleteAllAsyncTask(DeviceDao dao){
+            asyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            asyncTaskDao.deleteDatabase();
             return null;
         }
     }

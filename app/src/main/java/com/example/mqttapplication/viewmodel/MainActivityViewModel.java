@@ -46,6 +46,10 @@ public class MainActivityViewModel extends AndroidViewModel {
         repo.deleteAll(deviceID);
     }
 
+    public void deleteDatabase(){
+        repo.deleteDatabase();
+    }
+
     public LiveData<DeviceEntity> getLatestData(int deviceID){
         return repo.getLatestData(deviceID);
     }

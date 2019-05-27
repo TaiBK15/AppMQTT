@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -36,6 +38,7 @@ import com.example.mqttapplication.fragment.DeviceListFragment;
 import com.example.mqttapplication.fragment.MapFragment;
 import com.example.mqttapplication.roomdatabase.DeviceEntity;
 import com.example.mqttapplication.viewmodel.MainActivityViewModel;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -51,16 +54,14 @@ import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 
 import mqttsrc.MqttApi;
 
 public class MainActivity extends AppCompatActivity {
     static final String TAG = "MainActivityDebug";
 
-    private WifiManager wifiManager;
     //Main activity
     private TabLayout tablayout;
     private ViewPager viewPager;
@@ -90,12 +91,21 @@ public class MainActivity extends AppCompatActivity {
     private String currentTime;
     //Position
     private double lat, lng;
+    //Fire Database
+    private FirebaseDatabase mDatabase;
+    private DatabaseReference mGetReference;
+    private ValueEventListener eventListener;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Set login state is success
+        SharedPreferences.Editor login_state = getSharedPreferences("Login_State", MODE_PRIVATE).edit();
+        login_state.putBoolean("loginState", true);
+        login_state.commit();
 
         //Connect to mqtt server in the first time
         restorePreference();
@@ -123,57 +133,13 @@ public class MainActivity extends AppCompatActivity {
         tablayout.getTabAt(1).setIcon(R.drawable.ic_list);
         tablayout.getTabAt(2).setIcon(R.drawable.ic_gps);
 
-        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if(wifiManager.isWifiEnabled()){
-            Log.d(TAG, "Wifi online");
-            /**
-             * TO DO
-             * Xoa database tren dien thoai va cap nhat du lieu tu cloud
-             */
-        }
-        else
-            Log.d(TAG, "Wifi offline");
-    }
-
-    private BroadcastReceiver wifiStateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            int wifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN);
-            switch (wifiState){
-                case WifiManager.WIFI_STATE_ENABLED:
-                    Log.d(TAG, "WIFI ONLINE");
-                    /**
-                     * TO DO
-                     * Xoa database tren dien thoai va cap nhat du lieu tu cloud
-                     */
-                    break;
-                case WifiManager.WIFI_STATE_DISABLED:
-                    Log.d(TAG, "WIFI OFFLINE");
-                    break;
-            }
-        }
-    };
-
-    private void getDataFireBase(){
-        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        database.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        IntentFilter intentFilter = new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION);
-        registerReceiver(wifiStateReceiver, intentFilter);
+        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkStateReceiver, intentFilter);
     }
 
     @Override
@@ -191,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(wifiStateReceiver);
+        unregisterReceiver(networkStateReceiver);
     }
 
     @Override
@@ -203,13 +169,144 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
-        if (id == R.id.main_item_menu) {
-            dialogConnectSetting();
-            return true;
+        switch (id){
+            case R.id.settings:
+                dialogConnectSetting();
+                return true;
+            case R.id.logout:
+                logOut();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void logOut(){
+        FirebaseAuth.getInstance().signOut();
+        //Set login state is success
+        SharedPreferences.Editor login_state = getSharedPreferences("Login_State", MODE_PRIVATE).edit();
+        login_state.putBoolean("loginState", false);
+        login_state.commit();
+
+        //Disconnect the MQTT client to avoid running callback method
+        if (mqttAndroidClient != null) {
+            try {
+                mqttApi.disconnect(mqttAndroidClient);
+            } catch (MqttException e) {
+                e.printStackTrace();
+            }
+        }
+
+        goToLoginActivity();
+
+    }
+
+    private void goToLoginActivity(){
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    /**
+     * Receiver network state change event
+     */
+    private BroadcastReceiver networkStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            try
+            {
+                if (isOnline(context)) {
+                    Log.d(TAG, "ACCESS INTERNET SUCCESS!");
+
+                } else {
+                    Log.d(TAG, "ACCESS INTERNET FAIL!");
+                }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
+    /**
+     * Check connectivity state
+     * @param context
+     * @return
+     */
+    private boolean isOnline(Context context) {
+        try {
+            ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo netInfo = connectivityManager.getActiveNetworkInfo();
+            //should check null because in airplane mode it will be null
+            return (netInfo != null && netInfo.isConnected());
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    /**
+     * Get data from real time database Firebase
+     */
+    private void getDataFireBase(){
+        mDatabase = FirebaseDatabase.getInstance();
+        mGetReference = mDatabase.getReference("End_device");
+        eventListener = mGetReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                SharedPreferences mqttConnInfo = getSharedPreferences("MQTTConnectionSetup", MODE_PRIVATE);
+                boolean conn = mqttConnInfo.getBoolean("connStatus", false);
+                if (dataSnapshot.exists() && conn && isOnline(getApplicationContext())) {
+                    model.deleteDatabase();
+                    //Get entire data from realtime database
+                    HashMap<String, Object> dataMap = (HashMap<String, Object>) dataSnapshot.getValue();
+                    //Check all device ID from database
+                    for (String deviceID : dataMap.keySet()) {
+                        Log.d(TAG, "===========key: " + deviceID + "===========");
+                        //Get all objects from device id
+                        Object numDeviceData = dataMap.get(deviceID);
+                        HashMap<String, Object> allDeviceData = (HashMap<String, Object>) numDeviceData;
+                        //Check all key in each device id
+                        for (String key : allDeviceData.keySet()){
+                            Object data = allDeviceData.get(key);
+                            HashMap<String, Object> sensor = (HashMap<String, Object>) data;
+                            Log.d(TAG, "currentTime: " + sensor.get("time"));
+                            Log.d(TAG, "bright: " + sensor.get("bright"));
+                            Log.d(TAG, "temp: " + sensor.get("temp"));
+                            Log.d(TAG, "humidity: " + sensor.get("humidity"));
+                            Log.d(TAG, "-------------------------------------");
+                            int id = Character.getNumericValue(deviceID.charAt(deviceID.length()-1));
+                            temp = Integer.parseInt(sensor.get("temp")+"");
+                            bright = Integer.parseInt(sensor.get("bright")+"");
+                            humidity = Integer.parseInt(sensor.get("humidity")+"");
+                            model.insert(new DeviceEntity((String)sensor.get("time"), id, temp, bright, humidity));
+                        }
+//
+//                        try{
+//
+//                            String mString = String.valueOf(dataMap.get(key));
+//                            Log.d(TAG, mString + "");
+//
+//
+//                        }catch (ClassCastException cce2){
+//
+//                        }
+                    }
+
+                    mGetReference.removeEventListener(eventListener);
+                }
+                else
+                    mGetReference.removeEventListener(eventListener);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     /**
@@ -374,6 +471,7 @@ public class MainActivity extends AppCompatActivity {
                 //Save connect status to viewmodels
                 model.setConnStatus(isConnected);
 
+                getDataFireBase();
                 //Publish event
                 if (isRunning != true) {
                     EventBus.getDefault().post(new ConnectStatusEvent(isConnected));
