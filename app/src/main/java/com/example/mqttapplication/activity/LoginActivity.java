@@ -43,7 +43,6 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        sendFCMTokenToServer();
         SharedPreferences login_state = getSharedPreferences("Login_State", MODE_PRIVATE);
         isLogin = login_state.getBoolean("loginState", false);
         if(isLogin){
@@ -172,14 +171,6 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void sendFCMTokenToServer(){
-        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(LoginActivity.this, new OnSuccessListener<InstanceIdResult>() {
-            @Override
-            public void onSuccess(InstanceIdResult instanceIdResult) {
-                String newToken = instanceIdResult.getToken();
-                Log.d(TAG, newToken);
-            }
-        });
-    }
+
 
 }

@@ -38,12 +38,15 @@ import com.example.mqttapplication.fragment.DeviceListFragment;
 import com.example.mqttapplication.fragment.MapFragment;
 import com.example.mqttapplication.roomdatabase.DeviceEntity;
 import com.example.mqttapplication.viewmodel.MainActivityViewModel;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -101,6 +104,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        sendFCMTokenToServer();
 
         //Set login state is success
         SharedPreferences.Editor login_state = getSharedPreferences("Login_State", MODE_PRIVATE).edit();
@@ -179,6 +184,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void sendFCMTokenToServer(){
+        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(MainActivity.this, new OnSuccessListener<InstanceIdResult>() {
+            @Override
+            public void onSuccess(InstanceIdResult instanceIdResult) {
+                String newToken = instanceIdResult.getToken();
+                Log.d(TAG, newToken);
+            }
+        });
     }
 
     private void logOut(){
