@@ -1,5 +1,6 @@
 package com.example.mqttapplication.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -7,8 +8,10 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -17,13 +20,17 @@ import android.widget.Toast;
 
 import com.example.mqttapplication.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import static java.lang.Thread.sleep;
 
 public class LoginActivity extends AppCompatActivity {
+    final String TAG = "Login Activity";
     private FirebaseAuth mAuth;
     private EditText edt_email, edt_password;
     private CheckBox showpw, remember;
@@ -36,6 +43,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sendFCMTokenToServer();
         SharedPreferences login_state = getSharedPreferences("Login_State", MODE_PRIVATE);
         isLogin = login_state.getBoolean("loginState", false);
         if(isLogin){
@@ -153,7 +161,25 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
                 });
+        closeKeyboard();
     }
 
+    private void closeKeyboard(){
+        View view = this.getCurrentFocus();
+        if(view != null){
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
+    private void sendFCMTokenToServer(){
+        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(LoginActivity.this, new OnSuccessListener<InstanceIdResult>() {
+            @Override
+            public void onSuccess(InstanceIdResult instanceIdResult) {
+                String newToken = instanceIdResult.getToken();
+                Log.d(TAG, newToken);
+            }
+        });
+    }
 
 }

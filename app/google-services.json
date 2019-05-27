@@ -34,6 +34,35 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:596120889035:android:28ac91a685f58a3c",
+        "android_client_info": {
+          "package_name": "com.example.myadminbklorasystem"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "596120889035-00gdfg4ogf4bh8rb0t623istvif8o1rr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDK9gTPSXvYXdOwgUFKXZDTtrkuagMi9WA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "596120889035-00gdfg4ogf4bh8rb0t623istvif8o1rr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"
