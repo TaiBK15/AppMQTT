@@ -37,6 +37,7 @@ import com.example.mqttapplication.fragment.ConnectStatusFragment;
 import com.example.mqttapplication.fragment.DeviceListFragment;
 import com.example.mqttapplication.fragment.MapFragment;
 import com.example.mqttapplication.roomdatabase.DeviceEntity;
+import com.example.mqttapplication.services.MyFirebaseMessagingService;
 import com.example.mqttapplication.viewmodel.MainActivityViewModel;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -47,6 +48,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -61,6 +63,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 
 import mqttsrc.MqttApi;
+
+import static com.example.mqttapplication.services.MyFirebaseMessagingService.TOPIC_FCM;
 
 public class MainActivity extends AppCompatActivity {
     static final String TAG = "MainActivityDebug";
@@ -192,12 +196,28 @@ public class MainActivity extends AppCompatActivity {
             public void onSuccess(InstanceIdResult instanceIdResult) {
                 String newToken = instanceIdResult.getToken();
                 Log.d(TAG, newToken);
+                subsribeToTopicFCM();
+            }
+        });
+    }
+
+    private void subsribeToTopicFCM(){
+        FirebaseMessaging.getInstance().subscribeToTopic(TOPIC_FCM).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG, "subscribe to " + TOPIC_FCM + " successfully");
             }
         });
     }
 
     private void logOut(){
         FirebaseAuth.getInstance().signOut();
+        FirebaseMessaging.getInstance().unsubscribeFromTopic(TOPIC_FCM).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG, "Unsubscribe topic successfully");
+            }
+        });
         //Set login state is success
         SharedPreferences.Editor login_state = getSharedPreferences("Login_State", MODE_PRIVATE).edit();
         login_state.putBoolean("loginState", false);
