@@ -46,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences login_state = getSharedPreferences("Login_State", MODE_PRIVATE);
         isLogin = login_state.getBoolean("loginState", false);
         if(isLogin){
-           goToMainActivity();
+            goToMainActivity();
         }
         else {
             setContentView(R.layout.activity_login);
@@ -149,6 +149,11 @@ public class LoginActivity extends AppCompatActivity {
                                 account.remove("password");
                             }
                             account.commit();
+
+                            //Set login state is success
+                            SharedPreferences.Editor login_state = getSharedPreferences("Login_State", MODE_PRIVATE).edit();
+                            login_state.putBoolean("loginState", true);
+                            login_state.commit();
 
                             prBar.setVisibility(View.GONE);
 

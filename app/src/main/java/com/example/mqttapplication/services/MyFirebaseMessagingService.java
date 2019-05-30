@@ -4,12 +4,14 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.example.mqttapplication.R;
+import com.example.mqttapplication.activity.LoginActivity;
 import com.example.mqttapplication.activity.MainActivity;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -25,8 +27,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     final String TAG = "Firebase message";
     public static String TOPIC_FCM = "LORA_SYSTEM";
 
-    private int temp, humidity;
     private String title, body;
+
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -71,6 +73,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
      */
     private void sendNotification(String title, String body) {
         Intent intent = new Intent(this, MainActivity.class);
+
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);

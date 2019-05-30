@@ -103,52 +103,36 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference mGetReference;
     private ValueEventListener eventListener;
 
+    private boolean isLogin;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
-        sendFCMTokenToServer();
+        SharedPreferences login_state = getSharedPreferences("Login_State", MODE_PRIVATE);
+        isLogin = login_state.getBoolean("loginState", false);
+        if(!isLogin){
+            goToLoginActivity();
+        }else{
+            setContentView(R.layout.activity_main);
 
-        //Set login state is success
-        SharedPreferences.Editor login_state = getSharedPreferences("Login_State", MODE_PRIVATE).edit();
-        login_state.putBoolean("loginState", true);
-        login_state.commit();
+            sendFCMTokenToServer();
 
-        //Connect to mqtt server in the first time
-        restorePreference();
-        if (!(hostname.equals("") || port.equals("") || username.equals("") || password.equals("")))
-            startMQTT();
+            //Connect to mqtt server in the first time
+            restorePreference();
+            if (!(hostname.equals("") || port.equals("") || username.equals("") || password.equals("")))
+                startMQTT();
 
-        toolbar = findViewById(R.id.main_toolbar);
-        setSupportActionBar(toolbar);
-        toolbar.setLogo(R.drawable.logo_bk_small);
-
-        tablayout = (TabLayout) findViewById(R.id.tablayout_main_activity);
-        viewPager = (ViewPager) findViewById(R.id.viewpager_main_activity);
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-
-        //Add fragment
-        adapter.addFragment(new ConnectStatusFragment(), "Connect");
-        adapter.addFragment(new DeviceListFragment(), "Device");
-        adapter.addFragment(new MapFragment(), "Position");
-
-        viewPager.setAdapter(adapter);
-        tablayout.setupWithViewPager(viewPager);
-
-        //Add icon for tablayout
-        tablayout.getTabAt(0).setIcon(R.drawable.ic_wifi);
-        tablayout.getTabAt(1).setIcon(R.drawable.ic_list);
-        tablayout.getTabAt(2).setIcon(R.drawable.ic_gps);
-
+            initLayout();
+        }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        registerReceiver(networkStateReceiver, intentFilter);
+//        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+//        registerReceiver(networkStateReceiver, intentFilter);
     }
 
     @Override
@@ -166,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(networkStateReceiver);
+//        unregisterReceiver(networkStateReceiver);
     }
 
     @Override
@@ -188,6 +172,29 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void initLayout(){
+        toolbar = findViewById(R.id.main_toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setLogo(R.drawable.logo_bk_small);
+
+        tablayout = (TabLayout) findViewById(R.id.tablayout_main_activity);
+        viewPager = (ViewPager) findViewById(R.id.viewpager_main_activity);
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+
+        //Add fragment
+        adapter.addFragment(new ConnectStatusFragment(), "Connect");
+        adapter.addFragment(new DeviceListFragment(), "Device");
+        adapter.addFragment(new MapFragment(), "Position");
+
+        viewPager.setAdapter(adapter);
+        tablayout.setupWithViewPager(viewPager);
+
+        //Add icon for tablayout
+        tablayout.getTabAt(0).setIcon(R.drawable.ic_wifi);
+        tablayout.getTabAt(1).setIcon(R.drawable.ic_list);
+        tablayout.getTabAt(2).setIcon(R.drawable.ic_gps);
     }
 
     private void sendFCMTokenToServer(){
