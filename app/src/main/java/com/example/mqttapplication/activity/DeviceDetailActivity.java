@@ -20,6 +20,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.example.mqttapplication.R;
+import com.example.mqttapplication.eventbus.ACKSwitchEvent;
 import com.example.mqttapplication.eventbus.ConnectStatusEvent;
 import com.example.mqttapplication.fragment.ChartFragment;
 import com.example.mqttapplication.roomdatabase.DeviceEntity;
@@ -164,7 +165,6 @@ public class DeviceDetailActivity extends AppCompatActivity implements View.OnLo
                 try{
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("topic", "device" + "\\/req");
-//                    jsonObject.put("topic", "device/req");
                     jsonObject.put("device_id", deviceID);
                     jsonObject.put("switch_state", swStatus);
                     mqttApi.publishToTopic(jsonObject.toString().replace("\\",""), 0, "device/req");
@@ -262,6 +262,17 @@ public class DeviceDetailActivity extends AppCompatActivity implements View.OnLo
             deviceToolbar.setSubtitle("Not found broker MQTT");
             fr_device_detail.setVisibility(LinearLayout.INVISIBLE);
         }
+    }
+
+    /**
+     * Subscribe switch state ack event from main activity
+     * @param ackSwitchEvent
+     */
+    @Subscribe(sticky = false, threadMode = ThreadMode.MAIN)
+    public void onEvent(ACKSwitchEvent ackSwitchEvent){
+        if(ackSwitchEvent.getSwID() == deviceID)
+            sw_light.setChecked(ackSwitchEvent.isSwState());
+
     }
 
     @Override

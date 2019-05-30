@@ -87,8 +87,15 @@ public class MqttApi {
 
                     //Subscribe only 1 topic
                     subscribeToTopic("device/data", 0);
-                    subscribeToTopic("device/sw_ack", 0);
                     subscribeToTopic("gw/gps", 0);
+                    subscribeToTopic("device/sw_ack/id_1", 0);
+                    subscribeToTopic("device/sw_ack/id_2", 0);
+                    subscribeToTopic("device/sw_ack/id_3", 0);
+                    subscribeToTopic("device/sw_ack/id_4", 0);
+                    subscribeToTopic("device/sw_ack/id_5", 0);
+                    subscribeToTopic("device/sw_ack/id_6", 0);
+                    subscribeToTopic("device/sw_ack/id_7", 0);
+                    subscribeToTopic("device/sw_ack/id_8", 0);
 
                 }
 
@@ -108,7 +115,6 @@ public class MqttApi {
                             .commit();
                     //Save connect status into viewmodel
                     fragConnModel.setConnStatus(isConnected);
-//                    DeviceDetailActivity.getInstance().setConnectToDevice(isConnected);
                 }
             });
 

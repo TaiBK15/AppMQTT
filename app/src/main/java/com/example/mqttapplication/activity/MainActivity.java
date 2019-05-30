@@ -31,6 +31,7 @@ import android.widget.Toast;
 
 import com.example.mqttapplication.R;
 import com.example.mqttapplication.adapter.ViewPagerAdapter;
+import com.example.mqttapplication.eventbus.ACKSwitchEvent;
 import com.example.mqttapplication.eventbus.ConnectStatusEvent;
 import com.example.mqttapplication.eventbus.GPSLocateEvent;
 import com.example.mqttapplication.fragment.ConnectStatusFragment;
@@ -104,6 +105,8 @@ public class MainActivity extends AppCompatActivity {
     private ValueEventListener eventListener;
 
     private boolean isLogin;
+    private boolean swState;
+    private int swID;
 
 
     @Override
@@ -534,7 +537,7 @@ public class MainActivity extends AppCompatActivity {
                 model.setConnStatus(isConnected);
 
                 //Publish event
-                if (isRunning != true) {
+                if (!isRunning) {
                     EventBus.getDefault().post(new ConnectStatusEvent(isConnected));
                 }
 
@@ -554,13 +557,25 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case "gw/gps":
                         parseJsonLocate(message.toString());
-                        EventBus.getDefault().post(new GPSLocateEvent(lat,lng));
                         //Save position value to share preference
                         getApplicationContext().getSharedPreferences("GPS_LOCATE", MODE_PRIVATE)
                                 .edit()
                                 .putLong("GPS_Lat", Double.doubleToRawLongBits(lat))
                                 .putLong("GPS_Long", Double.doubleToRawLongBits(lng))
                                 .commit();
+                        if(!isRunning)
+                            EventBus.getDefault().post(new GPSLocateEvent(lat,lng));
+                        break;
+                    default:
+                        if(topic.contains("device/sw_ack/id_")){
+                            parseJsonACK(message.toString());
+                            getApplicationContext().getSharedPreferences("SwitchState", MODE_PRIVATE)
+                                    .edit()
+                                    .putBoolean("sw_device_" + swID, swState)
+                                    .commit();
+                            if(!isRunning)
+                                EventBus.getDefault().post(new ACKSwitchEvent(swID, swState));
+                        }
                         break;
                 }
 
@@ -598,6 +613,19 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, lat + "");
         Log.d(TAG, lng + "");
 
+    }
+
+    /**
+     * Parse JSON object with ACK value
+     * @param ACK
+     * @throws JSONException
+     */
+    private void parseJsonACK(String ACK) throws JSONException {
+        JSONObject parse = new JSONObject(ACK);
+        swID = parse.getInt("device_ID");
+        swState = parse.getBoolean("sw_state");
+        Log.d(TAG, swID + "");
+        Log.d(TAG, swState + "");
     }
 
     /**
