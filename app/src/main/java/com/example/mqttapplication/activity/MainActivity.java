@@ -33,13 +33,13 @@ import com.example.mqttapplication.R;
 import com.example.mqttapplication.adapter.ViewPagerAdapter;
 import com.example.mqttapplication.eventbus.ACKSwitchEvent;
 import com.example.mqttapplication.eventbus.ConnectStatusEvent;
-import com.example.mqttapplication.eventbus.GPSLocateEvent;
 import com.example.mqttapplication.fragment.ConnectStatusFragment;
 import com.example.mqttapplication.fragment.DeviceListFragment;
 import com.example.mqttapplication.fragment.MapFragment;
 import com.example.mqttapplication.roomdatabase.DeviceEntity;
 import com.example.mqttapplication.services.MyFirebaseMessagingService;
 import com.example.mqttapplication.viewmodel.MainActivityViewModel;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -148,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         isRunning = false;
+        Log.d(TAG, "Main activity stop");
     }
 
     @Override
@@ -563,8 +564,7 @@ public class MainActivity extends AppCompatActivity {
                                 .putLong("GPS_Lat", Double.doubleToRawLongBits(lat))
                                 .putLong("GPS_Long", Double.doubleToRawLongBits(lng))
                                 .commit();
-                        if(!isRunning)
-                            EventBus.getDefault().post(new GPSLocateEvent(lat,lng));
+                        model.setLatlng(new LatLng(lat, lng));
                         break;
                     default:
                         if(topic.contains("device/sw_ack/id_")){
