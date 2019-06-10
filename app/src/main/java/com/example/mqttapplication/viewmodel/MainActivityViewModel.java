@@ -22,6 +22,7 @@ public class MainActivityViewModel extends AndroidViewModel {
     private final String TAG = "MainActivityViewModel";
     private MutableLiveData<Boolean> connStatus;
     private MutableLiveData<LatLng> gpsData;
+    private MutableLiveData<String> onlineDevice;
     private DeviceRepository repo;
 
     public MainActivityViewModel(@NonNull Application application) {
@@ -43,12 +44,23 @@ public class MainActivityViewModel extends AndroidViewModel {
         return gpsData;
     }
 
+    public MutableLiveData<String> getOnlineDevice() {
+        if(onlineDevice == null){
+            onlineDevice = new MutableLiveData<>();
+        }
+        return onlineDevice;
+    }
+
     public void setConnStatus(Boolean isConnected) {
         connStatus.setValue(isConnected);
     }
 
     public void setLatlng(LatLng latlng){
         gpsData.setValue(latlng);
+    }
+
+    public void setOnlineDevice(String connectedDevice){
+        onlineDevice.setValue(connectedDevice);
     }
 
     public void insert(DeviceEntity device_1){

@@ -87,6 +87,7 @@ public class MqttApi {
 
                     //Subscribe only 1 topic
                     subscribeToTopic("device/data", 0);
+                    subscribeToTopic("device/online", 0);
                     subscribeToTopic("gw/gps", 0);
                     subscribeToTopic("device/sw_ack/id_1", 0);
                     subscribeToTopic("device/sw_ack/id_2", 0);

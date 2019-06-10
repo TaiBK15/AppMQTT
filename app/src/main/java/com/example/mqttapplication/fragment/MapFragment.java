@@ -40,6 +40,7 @@ import static android.content.Context.MODE_PRIVATE;
 public class MapFragment extends Fragment implements OnMapReadyCallback {
     final String TAG = "MapFragment";
     private double lat_gw, lng_gw;
+    private String connectedDevice;
     private ArrayList<MyMarkerData> deviceMap;
     private SupportMapFragment mapFragment;
 
@@ -51,7 +52,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         SharedPreferences gps_locate = getActivity().getSharedPreferences("GPS_LOCATE", MODE_PRIVATE);
         lat_gw = Double.longBitsToDouble(gps_locate.getLong("GPS_Lat", 0));
         lng_gw = Double.longBitsToDouble(gps_locate.getLong("GPS_Long", 0));
-
+        connectedDevice = gps_locate.getString("ConnectedDevice", "");
         // Getting Reference to SupportMapFragment of fragment_map.xml
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
 
@@ -74,16 +75,45 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 mapFragment.getMapAsync(new OnMapReadyCallback() {
                     @Override
                     public void onMapReady(GoogleMap googleMap) {
-                        deviceMap = getDevicePosition(latLng, 8);
+                        deviceMap = getDevicePosition(latLng, connectedDevice);
                         drawGateway(googleMap, latLng);
-                        drawDevice(googleMap, deviceMap);
                         drawCircle(googleMap, latLng);
+                        if(deviceMap != null)
+                            drawDevice(googleMap, deviceMap);
 
-                        // Creating CameraUpdate object for position
+                            // Creating CameraUpdate object for position
                         CameraUpdate updatePosition = CameraUpdateFactory.newLatLngZoom(latLng, 17);
 
                         //Update position with animation
                         googleMap.animateCamera(updatePosition);
+                    }
+                });
+            }
+        });
+
+        model.getOnlineDevice().observe(getActivity(), new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable final String s) {
+                SharedPreferences gps_locate = getActivity().getSharedPreferences("GPS_LOCATE", MODE_PRIVATE);
+                lat_gw = Double.longBitsToDouble(gps_locate.getLong("GPS_Lat", 0));
+                lng_gw = Double.longBitsToDouble(gps_locate.getLong("GPS_Long", 0));
+                connectedDevice = s;
+                mapFragment.getMapAsync(new OnMapReadyCallback() {
+                    @Override
+                    public void onMapReady(GoogleMap googleMap) {
+                        LatLng gwCenter = new LatLng(lat_gw, lng_gw);
+                        deviceMap = getDevicePosition(gwCenter, connectedDevice);
+                        drawGateway(googleMap, gwCenter);
+                        drawCircle(googleMap, gwCenter);
+                        if(deviceMap != null){
+                            drawDevice(googleMap, deviceMap);
+
+                        // Creating CameraUpdate object for position
+                        CameraUpdate updatePosition = CameraUpdateFactory.newLatLngZoom(gwCenter, 17);
+
+                        //Update position with animation
+                        googleMap.animateCamera(updatePosition);
+                        }
                     }
                 });
             }
@@ -94,10 +124,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         LatLng gwCenter = new LatLng(lat_gw, lng_gw);
-        deviceMap = getDevicePosition(gwCenter, 8);
+        deviceMap = getDevicePosition(gwCenter, connectedDevice);
         drawGateway(googleMap, gwCenter);
-        drawDevice(googleMap, deviceMap);
         drawCircle(googleMap, gwCenter);
+        if(deviceMap != null)
+            drawDevice(googleMap, deviceMap);
 
         // Creating CameraUpdate object for position
         CameraUpdate updatePosition = CameraUpdateFactory.newLatLngZoom(gwCenter, 17);
@@ -140,10 +171,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         circleOptions.center(center);
 
         // Radius of the circle
-        circleOptions.radius(200);
+        circleOptions.radius(10);
 
         // Fill color of the circle
-        circleOptions.fillColor(0x33FFF929);
+        circleOptions.fillColor(0xAAFF3229);
 
         // Border width of the circle
         circleOptions.strokeWidth(0);
@@ -152,16 +183,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         googleMap.addCircle(circleOptions);
     }
 
-    private ArrayList<MyMarkerData> getDevicePosition(LatLng center, int numberDevice){
-        double deg = 360/numberDevice;
-        ArrayList<MyMarkerData> dataMap = new ArrayList<>();
-        for (int i = 1; i<=numberDevice; i++){
-            double latDevie = Math.sin(i * deg * Math.PI / 180)*0.001 + center.latitude;
-            double lngDevie = Math.cos(i * deg * Math.PI / 180)*0.001 + center.longitude;
+    private ArrayList<MyMarkerData> getDevicePosition(LatLng center, String seq){
+        if(seq.length() != 0){
+            double deg = 360/(seq.length());
+            ArrayList<MyMarkerData> dataMap = new ArrayList<>();
+            for (int i = 1; i<=seq.length(); i++){
+                double latDevie = Math.sin(i * deg * Math.PI / 180)*0.001 + center.latitude;
+                double lngDevie = Math.cos(i * deg * Math.PI / 180)*0.001 + center.longitude;
 
-            dataMap.add(new MyMarkerData(new LatLng(latDevie, lngDevie), "device_" + i));
+                dataMap.add(new MyMarkerData(new LatLng(latDevie, lngDevie), "device_" + seq.charAt(i-1)));
+            }
+            return dataMap;
         }
-        return dataMap;
+        else
+            return null;
+
     }
 
 }

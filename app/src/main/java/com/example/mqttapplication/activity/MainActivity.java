@@ -194,6 +194,7 @@ public class MainActivity extends AppCompatActivity {
 
         viewPager.setAdapter(adapter);
         tablayout.setupWithViewPager(viewPager);
+        viewPager.setOffscreenPageLimit(3);
 
         //Add icon for tablayout
         tablayout.getTabAt(0).setIcon(R.drawable.ic_wifi);
@@ -565,6 +566,15 @@ public class MainActivity extends AppCompatActivity {
                                 .putLong("GPS_Long", Double.doubleToRawLongBits(lng))
                                 .commit();
                         model.setLatlng(new LatLng(lat, lng));
+                        break;
+                    case "device/online":
+                        //Save connected devices to share preference
+                        getApplicationContext().getSharedPreferences("GPS_LOCATE", MODE_PRIVATE)
+                                .edit()
+                                .putString("ConnectedDevice", message.toString())
+                                .commit();
+                        model.setOnlineDevice(message.toString());
+                        Log.d(TAG, "Device Online: " + message.toString());
                         break;
                     default:
                         if(topic.contains("device/sw_ack/id_")){
