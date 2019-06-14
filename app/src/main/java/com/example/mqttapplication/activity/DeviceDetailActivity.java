@@ -3,6 +3,7 @@ package com.example.mqttapplication.activity;
 import android.app.Dialog;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.mqttapplication.R;
 import com.example.mqttapplication.eventbus.ACKSwitchEvent;
@@ -55,15 +57,17 @@ public class DeviceDetailActivity extends AppCompatActivity implements View.OnLo
     private MqttApi mqttApi;
     private Dialog loadToWait;
     private Thread waitACK;
-    private int TIMEOUT = 60;
+    private int TIMEOUT = 10;
     private int stickTime = 0;
+    private volatile boolean isThreadAlive = false;
+    private Context context;
 
     private final int TEMP = 0;
     private final int BRI = 1;
     private final int HUM = 2;
 
     public DeviceDetailActivity(){
-
+        context = this;
     }
 
     @Override
@@ -115,6 +119,8 @@ public class DeviceDetailActivity extends AppCompatActivity implements View.OnLo
         SharedPreferences switchState = getSharedPreferences("SwitchState", MODE_PRIVATE);
         swStatus = switchState.getBoolean("sw_device_" + deviceID, false);
         sw_light.setChecked(swStatus);
+//        sw_light.setEnabled(false);
+        sw_light.setClickable(false);
 
         //Call function to set background for Toolbar
         setBackgroundToolbar(deviceID);
@@ -166,11 +172,6 @@ public class DeviceDetailActivity extends AppCompatActivity implements View.OnLo
             @Override
             public void onClick(View v) {
                 swStatus = sw_light.isChecked();
-                SharedPreferences switchState = getSharedPreferences("SwitchState", MODE_PRIVATE);
-                SharedPreferences.Editor saveState = switchState.edit();
-                saveState.putBoolean("sw_device_" + deviceID, swStatus);
-                saveState.commit();
-
                 mqttApi = MainActivity.getMqttApi();
                 try{
                     JSONObject jsonObject = new JSONObject();
@@ -182,12 +183,6 @@ public class DeviceDetailActivity extends AppCompatActivity implements View.OnLo
                     Log.d(TAG, jsonObject.toString());
                 }catch (JSONException e){
                     e.printStackTrace();
-                }
-                if(waitACK != null){
-                    if(waitACK.isAlive()){
-                        waitACK.interrupt();
-                        waitACK = null;
-                    }
                 }
                 showWaitingSwitchACK();
             }
@@ -288,10 +283,11 @@ public class DeviceDetailActivity extends AppCompatActivity implements View.OnLo
     public void onEvent(ACKSwitchEvent ackSwitchEvent){
         if(ackSwitchEvent.getSwID() == deviceID){
             sw_light.setChecked(ackSwitchEvent.isSwState());
-            if(waitACK != null){
-                loadToWait.cancel();
-                waitACK.interrupt();
-                stickTime = 0;
+            Toast.makeText(this, "Control successfully", Toast.LENGTH_LONG).show();
+            if(isThreadAlive){
+                isThreadAlive = false;
+                if(loadToWait != null)
+                    loadToWait.cancel();
             }
         }
 
@@ -331,39 +327,53 @@ public class DeviceDetailActivity extends AppCompatActivity implements View.OnLo
     }
 
     private void showWaitingSwitchACK(){
-    loadToWait = new Dialog(this);
-    loadToWait.requestWindowFeature(Window.FEATURE_NO_TITLE);
-    loadToWait.setContentView(R.layout.dialog_waiting_ack);
-    loadToWait.setCancelable(false);
-    loadToWait.setCanceledOnTouchOutside(false);
-    loadToWait.show();
-    waitACK = new Thread() {
-        @Override
-        public void run() {
-//            runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//
-//                }
-//            });
-            while(stickTime <= TIMEOUT){
-                try{
-                    Thread.sleep(1000);
-                }catch (InterruptedException ex){
-                    ex.printStackTrace();
+        loadToWait = new Dialog(this);
+        loadToWait.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        loadToWait.setContentView(R.layout.dialog_waiting_ack);
+        loadToWait.setCancelable(false);
+        loadToWait.setCanceledOnTouchOutside(false);
+        loadToWait.show();
+        isThreadAlive = true;
+        waitACK = new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                while(isThreadAlive){
+                    Log.d(TAG, "Thread exist = " + isThreadAlive);
+                    try{
+                        Thread.sleep(1000);
+                    }catch (InterruptedException ex){
+                        ex.printStackTrace();
+                    }
+                    stickTime++;
+                    if(stickTime == TIMEOUT){
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                sw_light.setChecked(!sw_light.isChecked());
+                                loadToWait.cancel();
+                                Toast.makeText(context, "Control Failed!", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                        isThreadAlive = false;
+                    }
+                    Log.d(TAG, "time = " + stickTime);
                 }
-                stickTime++;
-                Log.d(TAG, "time=" + stickTime);
+                cleanThread();
             }
-            loadToWait.cancel();
-            stickTime = 0;
-            cleanThread();
-        }
-    };
-    waitACK.start();
+        };
+        waitACK.start();
     }
 
+
     private void cleanThread(){
-        Thread.currentThread().interrupt();
+        if(waitACK != null) {
+            if (waitACK.isAlive()) {
+                Log.d(TAG, "interrupt thread");
+                Thread.currentThread().interrupt();
+                waitACK = null;
+            }
+        }
+        stickTime = 0;
     }
 }

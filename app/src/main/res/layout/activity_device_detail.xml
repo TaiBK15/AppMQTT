@@ -61,7 +61,6 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginRight="40dp"
                     android:gravity="right|center"
-                    android:clickable="false"
                     android:scaleX="1.25"
                     android:scaleY="1.25"/>
 
