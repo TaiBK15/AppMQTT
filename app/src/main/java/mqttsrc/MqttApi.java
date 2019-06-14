@@ -131,7 +131,7 @@ public class MqttApi {
             encodedPayload = msg.getBytes("UTF_8");
             MqttMessage message = new MqttMessage(encodedPayload);
             message.setId(5866);
-            message.setRetained(true);
+            message.setRetained(false);
             message.setQos(qos);
             client.publish(topic, message);
         } catch (MqttException ex) {

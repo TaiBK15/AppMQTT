@@ -633,7 +633,7 @@ public class MainActivity extends AppCompatActivity {
     private void parseJsonACK(String ACK) throws JSONException {
         JSONObject parse = new JSONObject(ACK);
         swID = parse.getInt("device_ID");
-        swState = parse.getBoolean("sw_state");
+        swState = parse.getBoolean("led_state");
         Log.d(TAG, swID + "");
         Log.d(TAG, swState + "");
     }

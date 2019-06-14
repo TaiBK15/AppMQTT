@@ -1,5 +1,6 @@
 package com.example.mqttapplication.activity;
 
+import android.app.Dialog;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -32,6 +34,10 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ThreadLocalRandom;
+
 import mqttsrc.MqttApi;
 
 public class DeviceDetailActivity extends AppCompatActivity implements View.OnLongClickListener {
@@ -47,6 +53,10 @@ public class DeviceDetailActivity extends AppCompatActivity implements View.OnLo
     private int deviceID, temp, bright, humidity;
     private DeviceDetailViewModel deviceDetailViewModel;
     private MqttApi mqttApi;
+    private Dialog loadToWait;
+    private Thread waitACK;
+    private int TIMEOUT = 60;
+    private int stickTime = 0;
 
     private final int TEMP = 0;
     private final int BRI = 1;
@@ -173,7 +183,13 @@ public class DeviceDetailActivity extends AppCompatActivity implements View.OnLo
                 }catch (JSONException e){
                     e.printStackTrace();
                 }
-
+                if(waitACK != null){
+                    if(waitACK.isAlive()){
+                        waitACK.interrupt();
+                        waitACK = null;
+                    }
+                }
+                showWaitingSwitchACK();
             }
         });
 
@@ -270,8 +286,14 @@ public class DeviceDetailActivity extends AppCompatActivity implements View.OnLo
      */
     @Subscribe(sticky = false, threadMode = ThreadMode.MAIN)
     public void onEvent(ACKSwitchEvent ackSwitchEvent){
-        if(ackSwitchEvent.getSwID() == deviceID)
+        if(ackSwitchEvent.getSwID() == deviceID){
             sw_light.setChecked(ackSwitchEvent.isSwState());
+            if(waitACK != null){
+                loadToWait.cancel();
+                waitACK.interrupt();
+                stickTime = 0;
+            }
+        }
 
     }
 
@@ -306,5 +328,42 @@ public class DeviceDetailActivity extends AppCompatActivity implements View.OnLo
                 .replace(R.id.fr_device_detail, chartFragment)
                 .addToBackStack(null);
         transaction.commit();
+    }
+
+    private void showWaitingSwitchACK(){
+    loadToWait = new Dialog(this);
+    loadToWait.requestWindowFeature(Window.FEATURE_NO_TITLE);
+    loadToWait.setContentView(R.layout.dialog_waiting_ack);
+    loadToWait.setCancelable(false);
+    loadToWait.setCanceledOnTouchOutside(false);
+    loadToWait.show();
+    waitACK = new Thread() {
+        @Override
+        public void run() {
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//
+//                }
+//            });
+            while(stickTime <= TIMEOUT){
+                try{
+                    Thread.sleep(1000);
+                }catch (InterruptedException ex){
+                    ex.printStackTrace();
+                }
+                stickTime++;
+                Log.d(TAG, "time=" + stickTime);
+            }
+            loadToWait.cancel();
+            stickTime = 0;
+            cleanThread();
+        }
+    };
+    waitACK.start();
+    }
+
+    private void cleanThread(){
+        Thread.currentThread().interrupt();
     }
 }
