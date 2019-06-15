@@ -57,7 +57,7 @@ public class DeviceDetailActivity extends AppCompatActivity implements View.OnLo
     private MqttApi mqttApi;
     private Dialog loadToWait;
     private Thread waitACK;
-    private int TIMEOUT = 10;
+    private int TIMEOUT = 20;
     private int stickTime = 0;
     private volatile boolean isThreadAlive = false;
     private Context context;
@@ -283,11 +283,12 @@ public class DeviceDetailActivity extends AppCompatActivity implements View.OnLo
     public void onEvent(ACKSwitchEvent ackSwitchEvent){
         if(ackSwitchEvent.getSwID() == deviceID){
             sw_light.setChecked(ackSwitchEvent.isSwState());
-            Toast.makeText(this, "Control successfully", Toast.LENGTH_LONG).show();
             if(isThreadAlive){
                 isThreadAlive = false;
-                if(loadToWait != null)
+                if(loadToWait != null){
                     loadToWait.cancel();
+                    Toast.makeText(this, "Control successfully", Toast.LENGTH_LONG).show();
+                }
             }
         }
 
