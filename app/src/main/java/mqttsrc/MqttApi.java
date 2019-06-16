@@ -2,6 +2,8 @@ package mqttsrc;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.os.Build;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
@@ -24,11 +26,10 @@ import static android.content.Context.MODE_PRIVATE;
 public class MqttApi {
 
     final String TAG = "MQTT API";
-    final String clientID = "APP MQTT";
+    final String clientID = Build.ID;
     private Context context;
     private String hostserver, username, password;
-    private String publish_topic, subscribe_topic;
-    private boolean isConnected, isRunning;
+    private boolean isConnected;
 
     private MqttAndroidClient mqttAndroidClient;
 
@@ -102,8 +103,8 @@ public class MqttApi {
 
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    Log.d(TAG, "Connected MQTT failed");
-                    Toast.makeText(context, "Connected MQTT failed!", Toast.LENGTH_LONG).show();
+                    Log.d(TAG, "Connected MQTT failed!");
+                    Toast.makeText(context, "Connected MQTT failed", Toast.LENGTH_LONG).show();
 
                     if(dialog != null)
                         dialog.cancel();
