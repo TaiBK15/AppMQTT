@@ -56,6 +56,7 @@ public class MqttApi {
 
         //Create new object mqttclient
         mqttAndroidClient = new MqttAndroidClient(context, hostserver, clientID);
+        Log.d(TAG, "ClientId = " + clientID);
     }
 
     public void setCallback(MqttCallbackExtended callback) {
@@ -88,6 +89,7 @@ public class MqttApi {
 
                     //Subscribe only 1 topic
                     subscribeToTopic("device/data", 0);
+                    subscribeToTopic("device/offline", 0);
                     subscribeToTopic("device/online", 0);
                     subscribeToTopic("gw/gps", 0);
                     subscribeToTopic("device/sw_ack/id_1", 0);

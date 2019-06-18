@@ -18,15 +18,18 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.method.PasswordTransformationMethod;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Scroller;
 import android.widget.Toast;
 
 import com.example.mqttapplication.R;
@@ -103,11 +106,12 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseDatabase mDatabase;
     private DatabaseReference mGetReference;
     private ValueEventListener eventListener;
-
+    //Login
     private boolean isLogin;
     private boolean swState;
     private int swID;
-
+    //Device Online status
+    private String deviceOnline;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,13 +136,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-//        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-//        registerReceiver(networkStateReceiver, intentFilter);
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         isRunning = true;
@@ -149,12 +146,6 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         isRunning = false;
         Log.d(TAG, "Main activity stop");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-//        unregisterReceiver(networkStateReceiver);
     }
 
     @Override
@@ -436,7 +427,6 @@ public class MainActivity extends AppCompatActivity {
                 dialog_setting.cancel();
             }
         });
-
         dialog_setting.show();
     }
 
@@ -548,7 +538,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
-                Log.d(TAG, topic);
+                Log.d(TAG, "topic: " + topic);
 
                 switch (topic){
                     case "device/data":
@@ -556,6 +546,7 @@ public class MainActivity extends AppCompatActivity {
 //                        currentTime = df.format(calendar.getInstance().getTime());
                         parseJsonData(message.toString());
                         savingDatabase();
+                        addDeviceOnline(deviceID + "");
                         break;
                     case "gw/gps":
                         parseJsonLocate(message.toString());
@@ -567,14 +558,18 @@ public class MainActivity extends AppCompatActivity {
                                 .commit();
                         model.setLatlng(new LatLng(lat, lng));
                         break;
-                    case "device/online":
+                    case "device/offline":
                         //Save connected devices to share preference
+                        removeDeviceOnline(message.toString());
+                        Log.d(TAG, "device offline: "  + message.toString());
+                        break;
+                    case "device/online":
                         getApplicationContext().getSharedPreferences("GPS_LOCATE", MODE_PRIVATE)
                                 .edit()
                                 .putString("ConnectedDevice", message.toString())
                                 .commit();
                         model.setOnlineDevice(message.toString());
-                        Log.d(TAG, "Device Online: " + message.toString());
+                        Log.d(TAG, "device online: "  + message.toString());
                         break;
                     default:
                         if(topic.contains("device/sw_ack/id_")){
@@ -646,6 +641,39 @@ public class MainActivity extends AppCompatActivity {
         model.insert(new DeviceEntity(currentTime, deviceID, temp, bright, humidity));
     }
 
+    /**
+     * Add device online
+     * @return
+     */
+    private void addDeviceOnline(String id){
+        SharedPreferences gps_locate = getSharedPreferences("GPS_LOCATE", MODE_PRIVATE);
+        deviceOnline = gps_locate.getString("ConnectedDevice", "");
+        if(!deviceOnline.contains(id)){
+            deviceOnline = deviceOnline + id;
+            gps_locate.edit()
+                    .putString("ConnectedDevice", deviceOnline)
+                    .commit();
+            model.setOnlineDevice(deviceOnline);
+        }
+        Log.d(TAG, "Add " + id + "--> Device Online: " + deviceOnline);
+    }
+
+    /**
+     * Remove device online
+     * @return
+     */
+    private void removeDeviceOnline(String id){
+        SharedPreferences gps_locate = getSharedPreferences("GPS_LOCATE", MODE_PRIVATE);
+        deviceOnline = gps_locate.getString("ConnectedDevice", "");
+        if(deviceOnline.contains(id)){
+            deviceOnline = deviceOnline.replace(id + "", "");
+            gps_locate.edit()
+                    .putString("ConnectedDevice", deviceOnline)
+                    .commit();
+            model.setOnlineDevice(deviceOnline);
+        }
+        Log.d(TAG, "Remove " + id + "--> Device Online: " + deviceOnline);
+    }
     //Get previously created object
     public static MqttApi getMqttApi() {
         return mqttApi;
