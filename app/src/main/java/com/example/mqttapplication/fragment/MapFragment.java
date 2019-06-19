@@ -3,6 +3,7 @@ package com.example.mqttapplication.fragment;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.mqttapplication.R;
 import com.example.mqttapplication.eventbus.ConnectStatusEvent;
@@ -27,6 +29,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.greenrobot.eventbus.EventBus;
@@ -156,10 +159,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private void drawDevice(GoogleMap googleMap, ArrayList<MyMarkerData> dataMarker){
         for (MyMarkerData object :dataMarker){
-            googleMap.addMarker(new MarkerOptions()
+             googleMap.addMarker(new MarkerOptions()
                     .position(object.getLatLng())
-                    .title(object.getTitle())
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker))
+                    .icon(BitmapDescriptorFactory.fromBitmap(object.getBitmap()))
             );
         }
     }
@@ -190,8 +192,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             for (int i = 1; i<=seq.length(); i++){
                 double latDevie = Math.sin(i * deg * Math.PI / 180)*0.001 + center.latitude;
                 double lngDevie = Math.cos(i * deg * Math.PI / 180)*0.001 + center.longitude;
-
-                dataMap.add(new MyMarkerData(new LatLng(latDevie, lngDevie), "device_" + seq.charAt(i-1)));
+                dataMap.add(new MyMarkerData(new LatLng(latDevie, lngDevie), "device_" + seq.charAt(i-1), createBitmapMarker("device_" + seq.charAt(i-1))));
             }
             return dataMap;
         }
@@ -200,6 +201,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     }
 
+    private Bitmap createBitmapMarker(String title){
+        LinearLayout tv = (LinearLayout) this.getLayoutInflater().inflate(R.layout.bitmap_marker, null, false);
+        TextView tvTitle = (TextView) tv.findViewById(R.id.tvTitleMarker);
+        tvTitle.setText(title);
+        tv.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        tv.layout(0, 0, tv.getMeasuredWidth(), tv.getMeasuredHeight());
+        tv.setDrawingCacheEnabled(true);
+        tv.buildDrawingCache();
+        Bitmap bm = tv.getDrawingCache();
+        return bm;
+    }
 }
 
 
